@@ -1,0 +1,41 @@
+<% include partials/header %>
+    <div id='content'>
+      Store!
+    </div>
+
+    <script>
+      const contentEl = document.getElementById('content');
+      fetch( "/getProducts",{
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json"
+        }
+      })
+      .then(response => response.json())
+      .then(products => {
+        console.log(products);
+        var productList = [];
+        products.map(product => {
+          if (productList.indexOf(product.id) == -1){
+            productList[productList.length] = product.id;
+          }
+        })
+        for (var i = 0; i <= productList.length; i++){
+          var sizes = [];
+          var color = [];
+          products.map(product => {
+            if(productList[i] == product.id){
+              sizes[sizes.length] = product.size;
+              color[color.length] = product.color;
+
+            }
+          })
+          console.log(sizes);
+          console.log(color);
+        }
+      })
+
+    </script>
+
+<% include partials/footer %>

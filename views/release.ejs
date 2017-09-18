@@ -1,0 +1,126 @@
+<% include partials/header %>
+  <div id='content'>
+    <div class='releaseInfo'>
+      <%= year %> -- <%= name %><br /><br />
+      <img id='releaseLarge' src='<%= imgsrc %>'>
+      <div id='otherVersions'></div>
+    </div>
+    <div class='releaseInfo'>
+      <div><ol id='tracklist'></ol></div>
+    </div>
+  </div>
+  <script>
+      const year = <%= year %>;
+      var name = null;
+      var label = null;
+      var format = null;
+      var recorded = null;
+      var mastered = null;
+      var story = null;
+      var imgsrc = null;
+      var tracklist = null;
+      var otherVersions = null;
+
+      if ( '<%= name %>' != 'null' ){
+        name = '<%= name %>';
+      }
+      if ( '<%= label %>' != 'null' ){
+        label = '<%= label %>';
+      }
+      if ( '<%= format %>' != 'null' ){
+        format = '<%= format %>';
+      }
+      if ( '<%= recorded %>' != 'null' ){
+        recorded = '<%= recorded %>';
+      }
+      if ( '<%= mastered %>' != 'null' ){
+        mastered = '<%= mastered %>';
+      }
+      if ( '<%= story %>' != 'null' ){
+        story = '<%= story %>';
+      }
+      if ( '<%= imgsrc %>' != 'null' ){
+        imgsrc = '<%= imgsrc %>';
+      }
+      if ( '<%= otherVersions %>' != 'null' ){
+        otherVersions = '<%= otherVersions %>';
+      }
+      if ( '<%= tracklist %>' != 'null' ){
+        tracklist = '<%= tracklist %>';
+      }
+
+      const parseTracklist = (tracks) => {
+        var parsed = [];
+        var bucket = '';
+        for (var i = 0; i < tracks.length; i++){
+          if (tracks[i] != ','){
+            bucket += tracks[i];
+          } else {
+            parsed.push(String(bucket));
+            bucket = '';
+          }
+        }
+        parsed.push(String(bucket));
+        return parsed;
+      }
+
+      const parseVersions = (versions) => {
+        var parsed = [];
+        var bucket = '';
+        for (var i = 0; i < versions.length; i++){
+          if (versions[i] != ','){
+            bucket += versions[i];
+          } else {
+            parsed.push(parseInt(bucket));
+            bucket = '';
+          }
+        }
+        parsed.push(parseInt(bucket));
+        return parsed;
+      }
+
+      const tracklistEl = document.getElementById('tracklist');
+      if(tracklist){
+        tracklist = parseTracklist(tracklist);
+        tracklist.map(track => {
+          const trackLi = document.createElement('li');
+          trackLi.textContent = track;
+          tracklistEl.appendChild(trackLi);
+        })
+      }
+      if(otherVersions){
+        otherVersions = (parseVersions(otherVersions))
+
+
+        fetch( "/getOtherVersions",{
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(otherVersions)
+        })
+        .then(response => response.json())
+        .then(listOfJoints => {
+          if(listOfJoints){
+            const otherVersionsDiv = document.getElementById('otherVersions');
+            otherVersionsDiv.innerHTML = 'Other Versions: ';
+            const otherVersionsUl = document.createElement('ul');
+            otherVersionsDiv.appendChild(otherVersionsUl);
+            listOfJoints.map(joint => {
+              const jointAnchor = document.createElement('a');
+              const jointLi = document.createElement('li');
+              jointAnchor.setAttribute('href',`/getRelease?id=${joint.id}`)
+              jointAnchor.textContent = joint.name;
+              const jointSpan = document.createElement('span');
+              jointSpan.classList.add('releaseSpan');
+              jointSpan.appendChild(jointAnchor);
+              jointLi.appendChild(jointSpan)
+              otherVersionsUl.appendChild(jointLi);
+            })
+          }
+        })
+      }
+
+  </script>
+<% include partials/footer %>

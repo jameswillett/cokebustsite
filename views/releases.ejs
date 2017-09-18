@@ -1,0 +1,30 @@
+<% include partials/header %>
+    <div id='content' class='centered'>
+
+    </div>
+    <script>
+    const contentEl = document.getElementById('content');
+
+    fetch( "/getReleases",{
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json"
+      }
+    })
+    .then(response => response.json())
+    .then(discography => {
+      discography.map(release => {
+        const releaseDiv = document.createElement('div');
+        const releaseAnchor = document.createElement('a');
+        releaseAnchor.setAttribute('href', `/getRelease?id=${release.id}`)
+        releaseDiv.classList.add('releaseThumb');
+        
+        releaseDiv.innerHTML = `${release.name} (${release.year})<br /><img class = 'releaseThumbnail' src='${release.imgsrc}'>`;
+        releaseAnchor.appendChild(releaseDiv);
+        releaseAnchor.classList.add('centered');
+        contentEl.appendChild(releaseAnchor);
+      })
+    })
+    </script>
+<% include partials/footer %>
