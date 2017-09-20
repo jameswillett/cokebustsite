@@ -24,9 +24,60 @@ app.get('/', (req, res) => {
 })
 
 app.get('/news',(req, res) => {
-  res.render('news', {
-    title: 'News'
-  });
+  const min = 0;
+  const max = min + 5;
+  pool.query('select * from news order by id desc', (err, news) => {
+    if (err){
+      console.log(err)
+    }
+
+    var indexedNews = news.rows.map((entry, index) => {
+      return {index, author: entry.author, content:entry.content, date:entry.date}
+    })
+
+    var filteredNews = indexedNews.filter(entry => {
+      return entry.index >= min && entry.index < max
+    })
+
+    res.render('news', {
+      title: 'News',
+      news: filteredNews,
+      currentPage: 0,
+      nextPage: 1,
+      previousPage: null,
+      totalEntries: news.rows.length
+    });
+  })
+})
+
+app.get('/news/:id',(req, res) => {
+  const min = req.params.id*5;
+  const max = min + 5;
+  pool.query('select * from news order by date, id desc', (err, news) => {
+    if (err){
+      console.log(err)
+    }
+    var indexedNews = news.rows.map((entry, index) => {
+      return {index, author: entry.author, content:entry.content, date:entry.date}
+    })
+
+    var filteredNews = indexedNews.filter(entry => {
+      return entry.index >= min && entry.index < max
+    })
+
+    var prev = parseInt(req.params.id)-1;
+    if (prev==0){
+      prev=null;
+    }
+    res.render('news', {
+      title: 'News',
+      news: filteredNews,
+      previousPage: prev,
+      currentPage: parseInt(req.params.id),
+      nextPage: parseInt(req.params.id)+1,
+      totalEntries: news.rows.length
+    });
+  })
 })
 
 app.get('/getNews', (req, res) => {
@@ -91,54 +142,68 @@ app.get('/about', (req, res) => {
 })
 
 app.get('/releases', (req, res) => {
-  res.render('releases', {
-    title: `Releases & Discography`
-  })
-})
-
-app.get('/getReleases', (req, res) => {
   pool.query('select * from releases order by year desc, name desc', (err, releases) => {
     if (err){
       console.log(err)
     }
-    res.json(releases.rows)
-  })
-})
-
-app.use((req, res, next) => {
-  res.locals.title = null;
-  res.locals.year = null
-  res.locals.name = null;
-  res.locals.label = null;
-  res.locals.format = null;
-  res.locals.recorded = null;
-  res.locals.mastered = null;
-  res.locals.story = null;
-  next();
-})
-
-app.get('/getRelease', jsonParser, (req, res) => {
-  pool.query('select * from releases where id=$1',[req.query.id], (err, release) => {
-    const selected = release.rows[0];
-    if (!selected.imgsrc){
-      selected.imgsrc = 'jubert404.jpg'
-    }
-
-    res.render('release', {
-      title: selected.name + '',
-      year: selected.year,
-      name: selected.name + '',
-      label: selected.label + '',
-      format: selected.format + '',
-      recorded: selected.recorded + '',
-      mastered: selected.mastered + '',
-      story: selected.story + '',
-      imgsrc: selected.imgsrc + '',
-      otherVersions: selected.other_versions + '',
-      tracklist: selected.tracklist + ''
+    res.render('releases', {
+      title: `Releases & Discography`,
+      data: releases.rows
     })
   })
-});
+
+})
+
+
+app.get('/releases/:id', (req, res) => {
+  const id = req.params.id;
+  pool.query('select * from releases where id=$1',[id], (err, release) => {
+    if (err){
+      console.log(err)
+    }
+    const selected = release.rows[0];
+    pool.query(`select * from releases where id in (${selected.other_versions})`, (err2, others) => {
+      if (err2){
+        console.log(err2)
+      }
+      var listOfOthers = [];
+      others.rows.map(other => {
+        listOfOthers.push({name:other.name,id:other.id})
+      })
+
+      const parseTracklist = (tracks) => {
+        var parsed = [];
+        var bucket = '';
+        for (var i = 0; i < tracks.length; i++){
+          if (tracks[i] != ','){
+            bucket += tracks[i];
+          } else {
+            parsed.push(String(bucket));
+            bucket = '';
+          }
+        }
+        parsed.push(String(bucket));
+        return parsed;
+      }
+
+      if (selected.tracklist){
+        selected.tracklist = parseTracklist(selected.tracklist)
+      } else {
+        selected.tracklist = [];
+      }
+
+      res.render('release', {
+        title: selected.name,
+        year: selected.year,
+        name: selected.name,
+        imgsrc: `/${selected.imgsrc}`,
+        otherVersions: listOfOthers,
+        tracklist: selected.tracklist
+      })
+    })
+  })
+})
+
 
 app.post('/getOtherVersions', jsonParser, (req, res) => {
   var quer = '';

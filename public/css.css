@@ -101,7 +101,9 @@ td:first-child {
 }
 
 #releaseLarge {
-  height: 15em;
+  width:100%;
+  vertical-align: top;
+
 }
 
 .releaseThumb {
@@ -127,10 +129,29 @@ ul {
 }
 
 .releaseInfo {
-  display: inline-grid;
+  display:inline-table;
+  width: 30%;
+  padding: 1em;
+  align-self: center;
+  vertical-align: top;
 }
 
 .centered {
   align-content: center;
   align-self: center;
+}
+
+#releaseHeader{
+  text-align: center;
+  font-size: 1.5em;
+  font-weight: bolder;
+  padding-bottom: 2em;
+}
+
+.unclicky{
+  color:#666;
+}
+
+.unclicky:hover{
+  color:#666;
 }

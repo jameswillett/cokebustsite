@@ -1,84 +1,30 @@
 <% include partials/header %>
     <div id='content'>
-      <div id='moreless'></div>
+      <div id='moreless'>
+        <a id='prevLink' href='/news/<%= previousPage %>'>Previous</a>
+        <span> || </span>
+        <a id='nextLink' href='/news/<%= nextPage %>'>Next</a>
+      </div>
       <table id='news'>
+        <% news.map(entry => { %>
+          <tr>
+            <td class='info'>Posted on <%= entry.date.getMonth()+1 %>/<%= entry.date.getDate() %>/<%= entry.date.getYear()+1900 %> by <%= entry.author %></td>
+            <td class='entry'><%- entry.content %></td>
+          </tr>
+        <% }) %>
       </table>
-
     </div>
     <script>
-      var gMin = 0;
-      var gMax = 99999999;
-      const step = 5;
-      const newsEl = document.getElementById('news');
-      const moreLessEl = document.getElementById('moreless');
-      const getNews = (min) => {
-        fetch( "/getNews",{
-          method: "GET",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json"
-          }
-        })
-        .then(response => response.json())
-        .then(newsList => {
-          gMax = newsList.length;
-          for ( var i = 0 ; i < newsList.length ; i++ ) {
-            if ( i >= min && i < min+step){
-              const entryEl = document.createElement('tr');
-              newsEl.appendChild(entryEl);
-              const infoTd = document.createElement('td');
-              infoTd.classList.add('info');
-              infoTd.textContent = `Posted on ${newsList[i].date.toString().slice(5,-14)}-${newsList[i].date.toString().slice(0,-20)} by ${newsList[i].author}`
-              entryEl.appendChild(infoTd);
-              const contentTd = document.createElement('td');
-              contentTd.classList.add('entry');
-              contentTd.innerHTML = newsList[i].content;
-              entryEl.appendChild(contentTd);
-              }
-            }
-        })
+      const currentPage = <%= currentPage %>;
+      const totalEntries = <%= totalEntries %>;
 
-        var prevUp = false;
-
-        if(min){
-          const prevEl = document.createElement('a');
-          prevEl.setAttribute('href','#');
-          prevEl.textContent = 'Previous';
-          prevUp = true;
-          prevEl.addEventListener('click', () => {
-            min -= step;
-            if (min < 0){
-              min = 0
-            }
-            newsEl.innerHTML = '';
-            moreLessEl.innerHTML = '';
-            prevUp = false
-            getNews(min)
-          })
-          moreLessEl.appendChild(prevEl);
-
-        }
-        var nextUp = false;
-        if (min+step < gMax){
-          const nextEl = document.createElement('a');
-          nextEl.setAttribute('href','#');
-          nextEl.textContent = 'Next';
-          nextUp = true;
-          nextEl.addEventListener('click', () => {
-            min += step;
-            newsEl.innerHTML = '';
-            moreLessEl.innerHTML = '';
-            getNews(min)
-          })
-          moreLessEl.appendChild(nextEl);
-
-          if (prevUp && nextUp) {
-            const span = document.createElement('span')
-            span.textContent = ' || ';
-            moreLessEl.insertBefore(span, nextEl);
-          }
-        }
+      if ( currentPage == 0 ) {
+        document.getElementById('prevLink').removeAttribute('href');
+        document.getElementById('prevLink').classList.add('unclicky');
       }
-      getNews(0);
+      if ( totalEntries < (currentPage+1 ) * 5 ) {
+        document.getElementById('nextLink').removeAttribute('href');
+        document.getElementById('nextLink').classList.add('unclicky')
+      }
     </script>
 <% include partials/footer %>
