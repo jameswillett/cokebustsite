@@ -80,45 +80,29 @@ app.get('/news/:id',(req, res) => {
   })
 })
 
-app.get('/getNews', (req, res) => {
-  pool.query('select * from news order by date, id desc', (err, news) => {
-    if (err){
-      console.log(err)
-    }
-    res.json(news.rows)
-  })
-});
-
 app.get('/shows', (req, res) => {
-    res.render('shows', {
-      title: 'Shows'
-    })
-  })
-
-app.get('/getFutureShows', (req, res) => {
-  pool.query('select * from shows where date > now() order by date desc', (err, shows) => {
+  pool.query('select * from shows where date >= now() order by date desc', (err, shows) => {
     if (err){
       console.log(err)
     }
-    res.json(shows.rows)
+    res.render('shows', {
+      title: 'Shows',
+      shows: shows.rows
+    })
   })
 });
 
 app.get('/showarchive', (req, res) => {
-    res.render('showarchive', {
-      title: 'Show Archive'
-    })
-  })
-
-app.get('/getAllShows', (req, res) => {
-  pool.query('select * from shows order by date asc', (err, shows) => {
+  pool.query('select * from shows order by date desc', (err, shows) => {
     if (err){
       console.log(err)
     }
-    res.json(shows.rows)
+    res.render('showarchive', {
+      title: 'Show Archive',
+      shows: shows.rows
+    })
   })
 });
-
 
 app.get('/store', (req, res) => {
   res.render('store', {
@@ -162,7 +146,8 @@ app.get('/releases/:id', (req, res) => {
       console.log(err)
     }
     const selected = release.rows[0];
-    pool.query(`select * from releases where id in (${selected.other_versions})`, (err2, others) => {
+    console.log(selected);
+    pool.query(`select * from releases where meta=$1 and id!=$2`,[selected.meta, selected.id], (err2, others) => {
       if (err2){
         console.log(err2)
       }

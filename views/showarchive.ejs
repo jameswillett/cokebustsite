@@ -1,6 +1,7 @@
 <% include partials/header %>
     <div id='content'>
       <div>
+        <h2>Show Archive</h2>
         <table id='shows'>
           <tr>
             <th>Date</th>
@@ -10,11 +11,23 @@
             <th>Notes</th>
             <th>FB event Page</th>
           </tr>
+          <% shows.map( show => { %>
+            <tr>
+              <td class='showInfo'><%= show.date.getMonth()+1 %>/<%= show.date.getDate() %>/<%= show.date.getYear() - 100 %></td>
+              <td class='showInfo'><%= show.venue %></td>
+              <td class='showInfo'><%= show.address %></td>
+              <td class='showInfo'><%= show.time %></td>
+              <td class='showInfo'><%= show.notes %></td>
+              <% if ( show.links ) { %>
+                <td class='showInfo'><a href="<%= show.links %>">XXX</a></td>
+              <% } %>
+            </tr>
+          <% }) %>
         </table>
       </div>
     </div>
     <script>
-
+/*
       const showsEl = document.getElementById('shows');
       fetch( "/getAllShows",{
         method: "GET",

@@ -1,18 +1,23 @@
 <% include partials/header %>
     <div id='content'>
+      <!--<div id='moreless'>
+        <a id='prevLink' href='/news/<%= previousPage %>'>Previous</a>
+        <span> || </span>
+        <a id='nextLink' href='/news/<%= nextPage %>'>Next</a>
+      </div>-->
+      <table id='news'>
+        <% news.map(entry => { %>
+          <tr>
+            <td class='info'><%= entry.date.getMonth()+1 %>/<%= entry.date.getDate() %>/<%= entry.date.getYear()+1900 %> by <%= entry.author %></td>
+            <td class='entry'><%- entry.content %></td>
+          </tr>
+        <% }) %>
+      </table>
       <div id='moreless'>
         <a id='prevLink' href='/news/<%= previousPage %>'>Previous</a>
         <span> || </span>
         <a id='nextLink' href='/news/<%= nextPage %>'>Next</a>
       </div>
-      <table id='news'>
-        <% news.map(entry => { %>
-          <tr>
-            <td class='info'>Posted on <%= entry.date.getMonth()+1 %>/<%= entry.date.getDate() %>/<%= entry.date.getYear()+1900 %> by <%= entry.author %></td>
-            <td class='entry'><%- entry.content %></td>
-          </tr>
-        <% }) %>
-      </table>
     </div>
     <script>
       const currentPage = <%= currentPage %>;
@@ -22,7 +27,7 @@
         document.getElementById('prevLink').removeAttribute('href');
         document.getElementById('prevLink').classList.add('unclicky');
       }
-      if ( totalEntries < (currentPage+1 ) * 5 ) {
+      if ( totalEntries <= (currentPage+1 ) * 5 ) {
         document.getElementById('nextLink').removeAttribute('href');
         document.getElementById('nextLink').classList.add('unclicky')
       }

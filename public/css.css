@@ -1,16 +1,22 @@
 body{
   background-color: #000;
-  color: #fff;
+  color: #ddd;
   font-family: sans-serif;
 }
 
+
 #nav {
   background-color: inherit;
-  width: 100%;
-  margin: -10px auto;
+  display: inline-table;
+  margin: -10px;
+  margin-left: 0em;
   position: fixed;
   z-index: 100;
-  padding: 50px 0 50px 0;
+  width: 100%;
+  top: 0%;
+  padding-top: 3em;
+  padding-bottom: 0.75em;
+  padding-left: 3em;
 }
 
 #footer {
@@ -19,8 +25,8 @@ body{
   text-align: center;
   position: fixed;
   bottom: 0%;
-  padding-top: 15px;
-  height: 35px;
+  padding: 0.5em 0;
+  height: 2em;
   z-index: 100;
 }
 
@@ -29,9 +35,10 @@ body{
 }
 
 #content {
-  padding-top: 140px;
+  padding-top: 7em;
   padding-bottom: 35px;
   margin: 0 10%;
+  display: inline-block;
 }
 
 a {
@@ -46,19 +53,33 @@ a:hover{
 
 .navItem {
   font-size: 2em;
-  width: 19%;
+  padding: 0 0.2em;
+  display: inline-table;
+  width: 15%;
+  position: relative;
+  vertical-align: top;
+}
+
+.navLogo {
+  background-color: inherit;
+  padding-right: 2.5em;
   display: inline-table;
   position: relative;
-  text-align: center;
+  vertical-align: middle;
+  margin-top: -0.7em;
+}
+
+.navLogo img {
+  height: 4em;
 }
 
 #shows {
   width: 100%;
+  padding-bottom: 2em;
 }
 
 #news {
   width: 80%;
-  padding-top: 35px;
 }
 
 .info {
@@ -67,18 +88,16 @@ a:hover{
   font-style: italic;
 }
 
-.entry {
-  padding-left: 50px;
-}
+
 
 #moreless {
-  position: fixed;
+  position: relative;
+  display: inline-block;
   width: 100%;
   background-color: #000;
-  z-index: 100;
-  margin-top: -20px;
   padding-top: 10px;
-  padding-bottom: 10px;
+  padding-bottom: 0.2em;
+
 }
 
 .productImg {
@@ -90,18 +109,26 @@ a:hover{
 }
 
 td {
-  padding-top:10px;
-  padding-bottom:20px;
-  padding-right:20px;
+  padding-top:0.5em;
+  padding-bottom:0.5em;
 }
 
 td:first-child {
   padding-left:20px;
   padding-right:0;
 }
+.entry {
+  padding-left: 50px;
+  text-align: left
+}
+
+.showInfo {
+  text-align: center;
+  width: 10em;
+}
 
 #releaseLarge {
-  width:100%;
+  height:20em;
   vertical-align: top;
 
 }
@@ -130,10 +157,13 @@ ul {
 
 .releaseInfo {
   display:inline-table;
-  width: 30%;
   padding: 1em;
   align-self: center;
   vertical-align: top;
+}
+
+#tracklist{
+
 }
 
 .centered {
@@ -154,4 +184,21 @@ ul {
 
 .unclicky:hover{
   color:#666;
+}
+
+.jubertFooter{
+  height: 2em;
+  padding: 0 0.5em;
+}
+
+.footSubDiv{
+
+  vertical-align: middle;
+  display: inline-table;
+}
+
+.footerLinks{
+  height: inherit;
+  display: inline-table;
+  vertical-align: middle;
 }
