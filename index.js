@@ -69,6 +69,7 @@ app.get('/news/:id',(req, res) => {
     if (prev==0){
       prev=null;
     }
+
     res.render('news', {
       title: 'News',
       news: filteredNews,
@@ -81,7 +82,7 @@ app.get('/news/:id',(req, res) => {
 })
 
 app.get('/shows', (req, res) => {
-  pool.query('select * from shows where date >= now() order by date desc', (err, shows) => {
+  pool.query('select * from shows where date + 2 >= now() order by date asc', (err, shows) => {
     if (err){
       console.log(err)
     }
@@ -138,7 +139,6 @@ app.get('/releases', (req, res) => {
 
 })
 
-
 app.get('/releases/:id', (req, res) => {
   const id = req.params.id;
   pool.query('select * from releases where id=$1',[id], (err, release) => {
@@ -146,7 +146,6 @@ app.get('/releases/:id', (req, res) => {
       console.log(err)
     }
     const selected = release.rows[0];
-    console.log(selected);
     pool.query(`select * from releases where meta=$1 and id!=$2`,[selected.meta, selected.id], (err2, others) => {
       if (err2){
         console.log(err2)
@@ -186,25 +185,6 @@ app.get('/releases/:id', (req, res) => {
         tracklist: selected.tracklist
       })
     })
-  })
-})
-
-
-app.post('/getOtherVersions', jsonParser, (req, res) => {
-  var quer = '';
-  req.body.map((jawn,index) => {
-    quer += jawn;
-    if(index<req.body.length-1){
-      quer+=','
-    }
-  })
-
-  pool.query(`select * from releases where id in (${quer})`, (err, releases) => {
-    var listOfJoints = [];
-    releases.rows.map(joint => {
-      listOfJoints.push({name:joint.name,id:joint.id})
-    })
-    res.json(listOfJoints);
   })
 })
 

@@ -27,46 +27,5 @@
       </div>
     </div>
     <script>
-/*
-      const showsEl = document.getElementById('shows');
-      fetch( "/getAllShows",{
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json"
-        }
-      })
-      .then(response => response.json())
-      .then(showList => {
-        console.log(showList);
-        showList.map(show => {
-          const showInfo = document.createElement('tr');
-          const date = document.createElement('td');
-          var showTimestamp = new Date(show.date);
-          date.textContent = `${show.date.toString().slice(5,-14)}-${show.date.toString().slice(0,-20)}`;
-          console.log(show.date.toString().slice(5,2))
-          const venue = document.createElement('td');
-          venue.textContent = show.venue;
-          const address = document.createElement('td');
-          address.textContent = show.address;
-          const time = document.createElement('td');
-          time.textContent = show.time;
-          const notes = document.createElement('td');
-          notes.textContent = show.notes;
-          const fbLink = document.createElement('td');
-          if(show.links){
-            fbLink.innerHTML = `<a href="${show.links}">Link</a>`;
-          }
-
-          showInfo.appendChild(date);
-          showInfo.appendChild(venue);
-          showInfo.appendChild(address);
-          showInfo.appendChild(time);
-          showInfo.appendChild(notes);
-          showInfo.appendChild(fbLink);
-          showsEl.appendChild(showInfo);
-        })
-      })
-
     </script>
 <% include partials/footer %>

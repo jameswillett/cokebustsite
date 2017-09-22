@@ -2,6 +2,8 @@
     <div id='content'>
       <div>
         <h2>Upcoming Shows</h2>
+
+        <% if ( shows.length ){ %>
         <table id='shows'>
           <tr>
             <th>Date</th>
@@ -24,11 +26,12 @@
             </tr>
           <% }) %>
         </table>
+        <% } else { %>
+          <p>No upcoming shows!</p>
+        <% } %>
       </div>
       <a href='/showarchive'>See archive of ALL (documented) shows</a>
     </div>
     <script>
-    console.log(<%= shows.rows %>)
-
     </script>
 <% include partials/footer %>
