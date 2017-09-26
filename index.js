@@ -13,9 +13,9 @@ const pool = new Pool ({
 })
 
 app.set('view engine', 'ejs')
-app.set('views', `http://www.cokebust.life/views`)
+app.set('views', `${__dirname}/views/`)
 
-app.use(express.static('http://www.cokebust.life/public'));
+app.use(express.static('public'));
 
 app.get('/', (req, res) => {
   res.render('index');

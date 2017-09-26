@@ -4,7 +4,13 @@
     <link rel='stylesheet' href='/css.css'>
     <link rel="icon" type="image/x-icon" href="/jubertleft.png">
   </head>
-  <body>
+  <script>
+    const resizeContent = () => {
+      var offsetHeight = document.getElementById('nav').offsetHeight;
+      document.getElementById('content').style.paddingTop = offsetHeight;
+    }
+  </script>
+  <body onresize="resizeContent()" onload="resizeContent()">
     <div id='nav'>
       <div class='navLogo'><img src='/logo.jpg'></div>
       <div class='navItem'><a href='/news'>News</a></div>
