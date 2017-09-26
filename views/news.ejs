@@ -8,7 +8,7 @@
       <table id='news'>
         <% news.map(entry => { %>
           <tr>
-            <td class='info'><%= entry.date.getMonth()+1 %>/<%= entry.date.getDate() %>/<%= entry.date.getYear()+1900 %> by <%= entry.author %></td>
+            <td class='info'><%= entry.date.getMonth()+1 %>/<%= entry.date.getDate() %>/<%= entry.date.getYear()-100 %> by <%= entry.author %></td>
             <td class='entry'><%- entry.content %></td>
           </tr>
         <% }) %>
