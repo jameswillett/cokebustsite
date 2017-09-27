@@ -202,7 +202,7 @@ app.get('/admin', (req,res) => {
   res.render('login');
 })
 
-app.post('/admin', (req,res) => {
+app.post('/dashboard', (req,res) => {
   if( md5(req.body.password) == hashed ){
     res.render('dashboard')
   } else {
