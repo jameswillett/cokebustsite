@@ -195,7 +195,7 @@ app.get('/releases/:id', (req, res) => {
         imgsrc: `/${selected.imgsrc}`,
         otherVersions: listOfOthers,
         tracklist: selected.tracklist,
-        clicks: clicks;
+        clicks: clicks
       })
     })
   })
