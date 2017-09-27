@@ -110,6 +110,7 @@ app.get('/shows', (req, res) => {
 });
 
 app.get('/showarchive', (req, res) => {
+  clicks++;
   pool.query('select * from shows order by date desc', (err, shows) => {
     if (err){
       console.log(err)
