@@ -103,7 +103,8 @@ app.get('/shows', (req, res) => {
     }
     res.render('shows', {
       title: 'Shows',
-      shows: shows.rows
+      shows: shows.rows,
+      clicks: clicks
     })
   })
 });
@@ -122,8 +123,10 @@ app.get('/showarchive', (req, res) => {
 });
 
 app.get('/store', (req, res) => {
+  clicks++;
   res.render('store', {
-    title: 'Store'
+    title: 'Store',
+    clicks: clicks
   })
 })
 
