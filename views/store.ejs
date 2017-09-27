@@ -1,10 +1,10 @@
 <% include partials/header %>
     <script>
       const forwardToGraveMistake = () => {
-        setTimeout(window.location.replace('https://store.gravemistakerecords.com/search?q=coke+bust'),5000)
+        window.location.replace('https://store.gravemistakerecords.com/search?q=coke+bust')
       }
     </script>
-    <div id='content' onload="forwardToGraveMistake()">
+    <div id='content' onload="setTimeout(forwardToGraveMistake(),5000)">
       <p>Store Coming Soon! If not forwarded to Grave Mistake's webstore in 5 secs <a href='https://store.gravemistakerecords.com/search?q=coke+bust'>click here</a></p>
     </div>
 
