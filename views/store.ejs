@@ -1,7 +1,7 @@
 <% include partials/header %>
     <script>
       const forwardToGraveMistake = () => {
-        setTimeout(window.open('https://store.gravemistakerecords.com/search?q=coke+bust', '_blank'),5000)
+        setTimeout(window.location.replace('https://store.gravemistakerecords.com/search?q=coke+bust'),5000)
       }
     </script>
     <div id='content' onload="forwardToGraveMistake()">
