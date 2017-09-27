@@ -21,13 +21,20 @@ const pool = new Pool ({
 const hashed = '8ba3c1c2ef2db1de81f6fcbdca54c3e0';
 var clicks = 0;
 
+
 app.set('view engine', 'ejs')
 app.set('views', `${__dirname}/views/`)
 
 app.use(express.static('public'));
 
 app.get('/', (req, res) => {
-  res.render('index');
+  pool.query('select * from hits', (err, hits) => {
+    const hit = hits.rows[0].hits;
+    res.render('index',{
+      hits: hit
+    });
+  })
+  pool.query('update hits set hits = hits+1');
 })
 
 app.get('/news',(req, res) => {
