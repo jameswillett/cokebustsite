@@ -16,10 +16,6 @@ const connectionString = process.env.DATABASE_URL || 'postgresql://James:@localh
 
 const pool = new Pool ({
   connectionString: connectionString
-/*
-  user: 'James',
-  host: 'localhost',
-  database: 'James'*/
 })
 
 const hashed = '8ba3c1c2ef2db1de81f6fcbdca54c3e0';
