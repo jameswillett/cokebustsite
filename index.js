@@ -22,6 +22,7 @@ const pool = new Pool ({
 })
 
 const hashed = '8ba3c1c2ef2db1de81f6fcbdca54c3e0';
+var clicks = 0;
 
 app.set('view engine', 'ejs')
 app.set('views', `${__dirname}/views/`)
@@ -30,10 +31,10 @@ app.use(express.static('public'));
 
 app.get('/', (req, res) => {
   res.render('index');
-  console.log(md5('D4m4g3dC!ty'))
 })
 
 app.get('/news',(req, res) => {
+  clicks++;
   const min = 0;
   const max = min + 5;
   pool.query('select * from news order by id desc', (err, news) => {
@@ -55,12 +56,14 @@ app.get('/news',(req, res) => {
       currentPage: 0,
       nextPage: 1,
       previousPage: null,
-      totalEntries: news.rows.length
+      totalEntries: news.rows.length,
+      clicks: clicks
     });
   })
 })
 
 app.get('/news/:id',(req, res) => {
+  clicks++;
   const min = req.params.id*5;
   const max = min + 5;
   pool.query('select * from news order by date, id desc', (err, news) => {
@@ -86,12 +89,14 @@ app.get('/news/:id',(req, res) => {
       previousPage: prev,
       currentPage: parseInt(req.params.id),
       nextPage: parseInt(req.params.id)+1,
-      totalEntries: news.rows.length
+      totalEntries: news.rows.length,
+      clicks: clicks
     });
   })
 })
 
 app.get('/shows', (req, res) => {
+  clicks++;
   pool.query('select * from shows where date + 2 >= now() order by date asc', (err, shows) => {
     if (err){
       console.log(err)
@@ -110,47 +115,43 @@ app.get('/showarchive', (req, res) => {
     }
     res.render('showarchive', {
       title: 'Show Archive',
-      shows: shows.rows
+      shows: shows.rows,
+      clicks: clicks
     })
   })
 });
 
 app.get('/store', (req, res) => {
   res.render('store', {
-    title: 'Store',
-    forwardToGM: true
-  })
-})
-
-app.get('/getProducts', (req, res) => {
-  pool.query('select * from products', (err, products) => {
-    if (err){
-      console.log(err)
-    }
-    res.json(products.rows)
+    title: 'Store'
   })
 })
 
 app.get('/about', (req, res) => {
+  clicks++;
   res.render('about', {
-    title: `Jubert's Secret Blog`
+    title: `Jubert's Secret Blog`,
+    clicks: clicks
   })
 })
 
 app.get('/releases', (req, res) => {
+  clicks++;
   pool.query('select * from releases order by year desc, name desc', (err, releases) => {
     if (err){
       console.log(err)
     }
     res.render('releases', {
       title: `Releases & Discography`,
-      data: releases.rows
+      data: releases.rows,
+      clicks: clicks
     })
   })
 
 })
 
 app.get('/releases/:id', (req, res) => {
+  clicks++;
   const id = req.params.id;
   pool.query('select * from releases where id=$1',[id], (err, release) => {
     if (err){
@@ -193,7 +194,8 @@ app.get('/releases/:id', (req, res) => {
         name: selected.name,
         imgsrc: `/${selected.imgsrc}`,
         otherVersions: listOfOthers,
-        tracklist: selected.tracklist
+        tracklist: selected.tracklist,
+        clicks: clicks;
       })
     })
   })

@@ -1,7 +1,11 @@
 <html>
   <head>
     <link rel='stylesheet' href='/css.css'>
-    <link rel="icon" type="image/x-icon" href="/jubertleft.png">
+    <% if (clicks%2==0){ %>
+      <link rel="icon" type="image/x-icon" href="/jubertleft.png">
+    <% } else { %>
+      <link rel="icon" type="image/x-icon" href="/jubertright.png">
+    <% } %>
     <title>Coke Bust -- <%= title %></title>
   </head>
   <script>
