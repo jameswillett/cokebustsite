@@ -42,6 +42,12 @@ body{
   width:80%;
 }
 
+#admin {
+  background-color: #000;
+  text-align: center;
+  padding-top: 3em;
+}
+
 a {
   text-decoration: none;
   font-weight: bold;

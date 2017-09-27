@@ -1,7 +1,12 @@
 const express = require("express");
 const app = express();
 
+const md5 = require('md5');
+
+const passport = require('passport');
+
 const bodyParser = require("body-parser");
+app.use(bodyParser.urlencoded({ extended: true }));
 const jsonParser = bodyParser.json();
 
 const { Pool } = require('pg');
@@ -10,7 +15,13 @@ const connectionString = process.env.DATABASE_URL || 'postgresql://James:@localh
 
 const pool = new Pool ({
   connectionString: connectionString
+/*
+  user: 'James',
+  host: 'localhost',
+  database: 'James'*/
 })
+
+const hashed = '8ba3c1c2ef2db1de81f6fcbdca54c3e0';
 
 app.set('view engine', 'ejs')
 app.set('views', `${__dirname}/views/`)
@@ -19,6 +30,7 @@ app.use(express.static('public'));
 
 app.get('/', (req, res) => {
   res.render('index');
+  console.log(md5('D4m4g3dC!ty'))
 })
 
 app.get('/news',(req, res) => {
@@ -183,6 +195,27 @@ app.get('/releases/:id', (req, res) => {
         tracklist: selected.tracklist
       })
     })
+  })
+})
+
+app.get('/admin', (req,res) => {
+  res.render('login');
+})
+
+app.post('/admin', (req,res) => {
+  if( md5(req.body.password) == hashed ){
+    res.render('dashboard')
+  } else {
+    res.redirect('http://tacospin.com')
+  }
+})
+
+app.post('/postNews', (req,res) => {
+  pool.query('insert into news (author, content) values ($1, $2)',[req.body.author, req.body.content], (err, products) => {
+    if (err){
+      console.log(err)
+    }
+    res.render('dashboard')
   })
 })
 
