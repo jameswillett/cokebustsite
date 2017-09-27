@@ -7,11 +7,12 @@ const passport = require('passport');
 
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({ extended: true }));
+
 const jsonParser = bodyParser.json();
 
 const { Pool } = require('pg');
 
-const connectionString = process.env.DATABASE_URL || 'postgresql://James:@localhose:5432/James'
+const connectionString = process.env.DATABASE_URL || 'postgresql://James:@localhost:5432/James'
 
 const pool = new Pool ({
   connectionString: connectionString
