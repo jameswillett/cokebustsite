@@ -1,8 +1,11 @@
 <html>
   <head>
-    <title>Coke Bust -- <%= title %></title>
     <link rel='stylesheet' href='/css.css'>
     <link rel="icon" type="image/x-icon" href="/jubertleft.png">
+    <% if (forwardToGM){ %>
+      <meta http-equiv="refresh" content="5; url=https://store.gravemistakerecords.com/search?q=coke+bust" />
+    <% } %>
+    <title>Coke Bust -- <%= title %></title>
   </head>
   <script>
     const resizeContent = () => {

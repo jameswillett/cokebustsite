@@ -117,7 +117,8 @@ app.get('/showarchive', (req, res) => {
 
 app.get('/store', (req, res) => {
   res.render('store', {
-    title: 'Store'
+    title: 'Store',
+    forwardToGM: true
   })
 })
 
