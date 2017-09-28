@@ -209,3 +209,28 @@ ul {
   display: inline-table;
   vertical-align: middle;
 }
+
+#formDiv {
+  width: 40%;
+  display: inline-table;
+}
+
+#responsesDiv {
+  width: 40%;
+  display: inline-table;
+}
+
+#guestbookTextarea {
+  min-width: 25em;
+  min-height: 15em;
+  resize: none;
+}
+
+#guestbookAuthorField {
+  width: 25em;
+}
+
+.commentAuthor {
+  font-weight: bold;
+  color: #f00;
+}

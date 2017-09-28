@@ -1,0 +1,36 @@
+<% include partials/header %>
+    <div id='content'>
+      <div id='formDiv'>
+        <form id='guestbookForm' method='post' action='/postComment'>
+          NAME:<br /> <input id='guestbookAuthorField' type="text" name='author' required><br />
+          MESSAGE:<br /> <textarea id='guestbookTextarea' type="text" form='guestbookForm' name='content' required></textarea><br />
+          <input type='submit'>
+        </form>
+      </div>
+      <div id='responsesDiv'>
+        <ul>
+          <% data.map(entry => { %>
+          <li><span class='commentAuthor'><%= entry.author %></span class='commentAuthor'> on <%= entry.date.getMonth()+1 %>/<%= entry.date.getDate() %> >>>> <%- entry.content %></li>
+          <% }) %>
+        </ul>
+        <div id='moreless'>
+          <a id='prevLink' href='/guestbook/<%= previousPage %>'>Previous</a>
+          <span> || </span>
+          <a id='nextLink' href='/guestbook/<%= nextPage %>'>Next</a>
+        </div>
+      </div>
+    </div>
+    <script>
+      const currentPage = <%= currentPage %>;
+      const totalEntries = <%= totalEntries %>;
+
+      if ( currentPage == 0 ) {
+        document.getElementById('prevLink').removeAttribute('href');
+        document.getElementById('prevLink').classList.add('unclicky');
+      }
+      if ( totalEntries <= (currentPage+1 ) * 10 ) {
+        document.getElementById('nextLink').removeAttribute('href');
+        document.getElementById('nextLink').classList.add('unclicky')
+      }
+    </script>
+<% include partials/footer %>

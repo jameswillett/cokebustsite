@@ -99,6 +99,80 @@ app.get('/news/:id',(req, res) => {
   })
 })
 
+app.get('/guestbook', (req,res) => {
+  clicks++;
+  const min = 0;
+  const max = 10;
+
+  pool.query('select * from guestbook order by id desc', (err, data) => {
+    if (err){
+      console.log(err)
+    }
+
+    var indexedComments = data.rows.map((entry, index) => {
+      return {index, author: entry.author, content:entry.content, date:entry.date}
+    })
+
+    var filteredComments = indexedComments.filter(entry => {
+      return entry.index >= min && entry.index < max
+    })
+
+    res.render('guestbook',{
+      title: 'GUESTBOOK',
+      data: filteredComments,
+      currentPage: 0,
+      nextPage: 1,
+      previousPage: null,
+      totalEntries: data.rows.length,
+      clicks: clicks
+    })
+  })
+})
+
+app.get('/guestbook/:id', (req,res) => {
+  clicks++;
+  const min = req.params.id * 10;
+  const max = min + 10;
+
+  pool.query('select * from guestbook order by id desc', (err, data) => {
+    if (err){
+      console.log(err)
+    }
+
+    var indexedComments = data.rows.map((entry, index) => {
+      return {index, author: entry.author, content:entry.content, date:entry.date}
+    })
+
+    var filteredComments = indexedComments.filter(entry => {
+      return entry.index >= min && entry.index < max
+    })
+
+    var prev = parseInt(req.params.id)-1;
+    if (prev==0){
+      prev=null;
+    }
+
+    res.render('guestbook',{
+      title: 'GUESTBOOK',
+      data: filteredComments,
+      currentPage: parseInt(req.params.id),
+      nextPage: parseInt(req.params.id)+1,
+      previousPage: prev,
+      totalEntries: data.rows.length,
+      clicks: clicks
+    })
+  })
+})
+
+app.post('/postComment', (req, res) => {
+  pool.query('insert into guestbook (author, content) values ($1, $2)',[req.body.author, req.body.content], (err, comment) => {
+    if (err){
+      console.log(err)
+    }
+    res.redirect('/guestbook')
+  })
+})
+
 app.get('/shows', (req, res) => {
   clicks++;
   pool.query('select * from shows where date + 2 >= now() order by date asc', (err, shows) => {
@@ -222,7 +296,7 @@ app.post('/dashboard', (req,res) => {
 })
 
 app.post('/postNews', (req,res) => {
-  pool.query('insert into news (author, content) values ($1, $2)',[req.body.author, req.body.content], (err, products) => {
+  pool.query('insert into news (author, content) values ($1, $2)',[req.body.author, req.body.content], (err, news) => {
     if (err){
       console.log(err)
     }
