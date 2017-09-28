@@ -110,7 +110,7 @@ app.get('/guestbook', (req,res) => {
     }
 
     var indexedComments = data.rows.map((entry, index) => {
-      return {index, author: entry.author, content:entry.content, date:entry.date}
+      return {index, author: entry.author, content: entry.content, date: entry.date}
     })
 
     var filteredComments = indexedComments.filter(entry => {
