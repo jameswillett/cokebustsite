@@ -70,11 +70,9 @@ app.get('/news',(req, res) => {
       console.log(err)
     }
 
-    var indexedNews = news.rows.map((entry, index) => {
+    var filteredNews = news.rows.map((entry, index) => {
       return {index, author: entry.author, content:entry.content, date:entry.date}
-    })
-
-    var filteredNews = indexedNews.filter(entry => {
+    }).filter(entry => {
       return entry.index >= min && entry.index < max
     })
 
@@ -94,15 +92,14 @@ app.get('/news/:id',(req, res) => {
   clicks++;
   const min = req.params.id*5;
   const max = min + 5;
-  pool.query('select * from news order by date, id desc', (err, news) => {
+  pool.query('select * from news order by id desc', (err, news) => {
     if (err){
       console.log(err)
     }
-    var indexedNews = news.rows.map((entry, index) => {
-      return {index, author: entry.author, content:entry.content, date:entry.date}
-    })
 
-    var filteredNews = indexedNews.filter(entry => {
+    var filteredNews = news.rows.map((entry, index) => {
+      return {index, author: entry.author, content:entry.content, date:entry.date}
+    }).filter(entry => {
       return entry.index >= min && entry.index < max
     })
 
@@ -276,14 +273,14 @@ app.get('/releases/:id', (req, res) => {
       const parseTracklist = (tracks) => {
         var parsed = [];
         var bucket = '';
-        for (var i = 0; i < tracks.length; i++){
-          if (tracks[i] != ','){
-            bucket += tracks[i];
+        tracks.split('').map(char => {
+          if (char != ','){
+            bucket += char;
           } else {
             parsed.push(String(bucket));
             bucket = '';
           }
-        }
+        })
         parsed.push(String(bucket));
         return parsed;
       }
@@ -313,23 +310,37 @@ app.get('/admin', (req,res) => {
 
 app.post('/dashboard', (req, res, next) => {
   passport.authenticate('local', (err, user, info) => {
-    if (err) { return next(err); }
-    if (!user) {return res.redirect('http://www.tacospin.com');}
+    if (err) {
+      return next(err);
+    }
+
+    if (!user) {
+      return res.redirect('http://www.tacospin.com');
+    }
+
     req.logIn(user, (err) => {
-      if (err){ return next(err); }
+      if (err){
+        return next(err);
+      }
       return res.render('dashboard');
     })
   })(req, res, next);
 })
 
 app.get('/supersecretpage', (req, res) => {
-  res.render('secret');
+  var errMsg = '';
+  if( req.query.err ){
+    errMsg = 'that username is already taken, dingus!';
+  }
+  res.render('secret',{
+    errz:errMsg
+  });
 })
 
 app.post('/newUser', (req, res) => {
   pool.query('select * from users where username=$1',[req.body.username],(err, joint) => {
-    if(joint.rows.length!=0){
-      res.redirect('/supersecretpage')
+    if( joint.rows.length != 0 ){
+      res.redirect('/supersecretpage?err=1')
     } else {
       bcrypt.hash(req.body.password, 10, (err, hash) =>{
         pool.query('insert into users (username, hashedpw) values ($1, $2)',[req.body.username, hash], (err, joint) => {
