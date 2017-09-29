@@ -189,6 +189,14 @@ app.post('/postComment', (req, res) => {
      req.connection.remoteAddress ||
      req.socket.remoteAddress ||
      req.connection.socket.remoteAddress;
+
+  var commentCheck = new RegExp('.*(<script>|</html>).*');
+  console.log(req.body.content);
+  console.log(commentCheck.test(req.body.content));
+  if (commentCheck.test(req.body.content)){
+    console.log('it works!')
+    res.redirect('http://www.tacospin.com');
+  }
   pool.query('insert into guestbook (author, content, ip) values ($1, $2, $3)',[req.body.author, req.body.content, ip], (err, comment) => {
     if (err){
       console.log(err)
