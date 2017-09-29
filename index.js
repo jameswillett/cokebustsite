@@ -76,7 +76,7 @@ app.get('/news',(req, res) => {
       console.log(err)
     }
 
-    var filteredNews = news.rows.map((entry, index) => {
+    const filteredNews = news.rows.map((entry, index) => {
       return {index, author: entry.author, content:entry.content, date:entry.date}
     }).filter(entry => {
       return entry.index >= min && entry.index < max
@@ -102,7 +102,7 @@ app.get('/news/:id',(req, res) => {
       console.log(err)
     }
 
-    var filteredNews = news.rows.map((entry, index) => {
+    const filteredNews = news.rows.map((entry, index) => {
       return {index, author: entry.author, content:entry.content, date:entry.date}
     }).filter(entry => {
       return entry.index >= min && entry.index < max
@@ -134,11 +134,9 @@ app.get('/guestbook', (req,res) => {
       console.log(err)
     }
 
-    var indexedComments = data.rows.map((entry, index) => {
+    const filteredComments = data.rows.map((entry, index) => {
       return {index, author: entry.author, content: entry.content, date: entry.date}
-    })
-
-    var filteredComments = indexedComments.filter(entry => {
+    }).filter(entry => {
       return entry.index >= min && entry.index < max
     })
 
@@ -163,11 +161,9 @@ app.get('/guestbook/:id', (req,res) => {
       console.log(err)
     }
 
-    var indexedComments = data.rows.map((entry, index) => {
-      return {index, author: entry.author, content:entry.content, date:entry.date}
-    })
-
-    var filteredComments = indexedComments.filter(entry => {
+    const filteredComments = data.rows.map((entry, index) => {
+      return {index, author: entry.author, content: entry.content, date: entry.date}
+    }).filter(entry => {
       return entry.index >= min && entry.index < max
     })
 
