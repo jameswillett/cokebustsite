@@ -6,6 +6,7 @@ const app = express( );
 const expressSession = require( 'express-session' );
 const LocalStrategy = require( 'passport-local' ).Strategy;
 const passport = require( 'passport' );
+const sanitizeHtml = require('sanitize-html');
 const { Pool } = require( 'pg' );
 
 const connectionString = process.env.DATABASE_URL || 'postgresql://James:@localhost:5432/James'
@@ -162,7 +163,7 @@ app.get('/guestbook/:id', (req,res) => {
     }
 
     const filteredComments = data.rows.map((entry, index) => {
-      return {index, author: entry.author, content: entry.content, date: entry.date}
+      return {index, author: entry.author, content: entry.content, date: entry.date, id: entry.id}
     }).filter(entry => {
       return entry.index >= min && entry.index < max
     })
@@ -190,14 +191,11 @@ app.post('/postComment', (req, res) => {
      req.socket.remoteAddress ||
      req.connection.socket.remoteAddress;
 
-  var commentCheck = new RegExp('.*(<script>|</html>).*');
-  console.log(req.body.content);
-  console.log(commentCheck.test(req.body.content));
+  var commentCheck = new RegExp('.*(<script|</html).*');
   if (commentCheck.test(req.body.content)){
-    console.log('it works!')
     res.redirect('http://www.tacospin.com');
   }
-  pool.query('insert into guestbook (author, content, ip) values ($1, $2, $3)',[req.body.author, req.body.content, ip], (err, comment) => {
+  pool.query('insert into guestbook (author, content, ip) values ($1, $2, $3)',[req.body.author, sanitizeHtml(req.body.content), ip], (err, comment) => {
     if (err){
       console.log(err)
     }

@@ -10,7 +10,7 @@
       <div id='responsesDiv'>
         <ul>
           <% data.map(entry => { %>
-            <li><span class='commentAuthor'><%= entry.author %></span class='commentAuthor'> on <%= entry.date.getMonth()+1 %>/<%= entry.date.getDate() %>/<%= entry.date.getYear()-100 %> >>>> <%- entry.content %></li>
+            <li><span class='commentAuthor'><%= entry.author %></span class='commentAuthor'> on <%= entry.date.getMonth()+1 %>/<%= entry.date.getDate() %>/<%= entry.date.getYear()-100 %> >>>> <span class='guestbookContent' id="<%- entry.index %>"><%- entry.content %></span></li>
           <% }) %>
         </ul>
         <div id='moreless'>
@@ -21,6 +21,7 @@
       </div>
     </div>
     <script>
+
       const currentPage = <%= currentPage %>;
       const totalEntries = <%= totalEntries %>;
 
