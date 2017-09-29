@@ -328,12 +328,10 @@ app.get('/supersecretpage', (req, res) => {
 
 app.post('/newUser', (req, res) => {
   pool.query('select * from users where username=$1',[req.body.username],(err, joint) => {
-    console.log(joint.rows)
     if(joint.rows.length!=0){
-      res.send('username is already taken, asshole')
+      res.redirect('/supersecretpage')
     } else {
       bcrypt.hash(req.body.password, 10, (err, hash) =>{
-        console.log(hash)
         pool.query('insert into users (username, hashedpw) values ($1, $2)',[req.body.username, hash], (err, joint) => {
           if (err){
             console.log(err)
