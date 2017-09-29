@@ -13,6 +13,8 @@ const pool = new Pool ({
   connectionString: connectionString
 })
 
+let click;
+
 app.set('view engine', 'ejs')
 app.set('views', `${__dirname}/views/`)
 
@@ -22,6 +24,11 @@ app.use(expressSession({ secret: 'x' }));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(passport.initialize());
 app.use(passport.session());
+app.use((req, res, next) => {
+  click = req.session.clicks;
+  req.session.clicks++
+  next()
+});
 
 passport.use(new LocalStrategy((username, password, done) => {
   pool.query('select username, hashedpw from users where username = $1',[username],(err,user) => {
@@ -52,8 +59,6 @@ app.get('/', (req, res) => {
      req.connection.remoteAddress ||
      req.socket.remoteAddress ||
      req.connection.socket.remoteAddress;
-  console.log(ip);
-  req.session.clicks=1;
   pool.query('select * from hits', (err, hits) => {
     const hit = hits.rows[0].hits;
     res.render('index',{
@@ -64,7 +69,6 @@ app.get('/', (req, res) => {
 })
 
 app.get('/news',(req, res) => {
-  req.session.clicks++;
   const min = 0;
   const max = min + 5;
   pool.query('select * from news order by id desc', (err, news) => {
@@ -85,13 +89,12 @@ app.get('/news',(req, res) => {
       nextPage: 1,
       previousPage: null,
       totalEntries: news.rows.length,
-      clicks: req.session.clicks
+      clicks: click
     });
   })
 })
 
 app.get('/news/:id',(req, res) => {
-  req.session.clicks++
   const min = req.params.id*5;
   const max = min + 5;
   pool.query('select * from news order by id desc', (err, news) => {
@@ -117,13 +120,12 @@ app.get('/news/:id',(req, res) => {
       currentPage: parseInt(req.params.id),
       nextPage: parseInt(req.params.id)+1,
       totalEntries: news.rows.length,
-      clicks: req.session.clicks
+      clicks: click
     });
   })
 })
 
 app.get('/guestbook', (req,res) => {
-  req.session.clicks++;
   const min = 0;
   const max = 10;
 
@@ -147,13 +149,12 @@ app.get('/guestbook', (req,res) => {
       nextPage: 1,
       previousPage: null,
       totalEntries: data.rows.length,
-      clicks: req.session.clicks
+      clicks: click
     })
   })
 })
 
 app.get('/guestbook/:id', (req,res) => {
-  req.session.clicks++;
   const min = req.params.id * 10;
   const max = min + 10;
 
@@ -182,7 +183,7 @@ app.get('/guestbook/:id', (req,res) => {
       nextPage: parseInt(req.params.id)+1,
       previousPage: prev,
       totalEntries: data.rows.length,
-      clicks: req.session.clicks
+      clicks: click
     })
   })
 })
@@ -201,7 +202,6 @@ app.post('/postComment', (req, res) => {
 })
 
 app.get('/shows', (req, res) => {
-  req.session.clicks++;
   pool.query('select * from shows where date + 2 >= now() order by date asc', (err, shows) => {
     if (err){
       console.log(err)
@@ -209,13 +209,12 @@ app.get('/shows', (req, res) => {
     res.render('shows', {
       title: 'Shows',
       shows: shows.rows,
-      clicks: req.session.clicks
+      clicks: click
     })
   })
 });
 
 app.get('/showarchive', (req, res) => {
-  req.session.clicks++;
   pool.query('select * from shows order by date desc', (err, shows) => {
     if (err){
       console.log(err)
@@ -223,29 +222,26 @@ app.get('/showarchive', (req, res) => {
     res.render('showarchive', {
       title: 'Show Archive',
       shows: shows.rows,
-      clicks: req.session.clicks
+      clicks: click
     })
   })
 });
 
 app.get('/store', (req, res) => {
-  req.session.clicks++;
   res.render('store', {
     title: 'Store',
-    clicks: req.session.clicks
+    clicks: click
   })
 })
 
 app.get('/about', (req, res) => {
-  req.session.clicks++;
   res.render('about', {
     title: `Jubert's Secret Blog`,
-    clicks: req.session.clicks
+    clicks: click
   })
 })
 
 app.get('/releases', (req, res) => {
-  req.session.clicks++;
   pool.query('select * from releases order by year desc, name desc', (err, releases) => {
     if (err){
       console.log(err)
@@ -253,15 +249,14 @@ app.get('/releases', (req, res) => {
     res.render('releases', {
       title: `Releases & Discography`,
       data: releases.rows,
-      clicks: req.session.clicks
+      clicks: click
     })
   })
 
 })
 
 app.get('/releases/:id', (req, res) => {
-  req.session.clicks++;
-  console.log(req.session.clicks);
+  console.log(click);
   const id = req.params.id;
   pool.query('select * from releases where id=$1',[id], (err, release) => {
     if (err){
@@ -305,7 +300,7 @@ app.get('/releases/:id', (req, res) => {
         imgsrc: `/${selected.imgsrc}`,
         otherVersions: listOfOthers,
         tracklist: selected.tracklist,
-        clicks: req.session.clicks
+        clicks: click
       })
     })
   })
