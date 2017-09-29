@@ -314,7 +314,7 @@ app.get('/admin', (req,res) => {
 app.post('/dashboard', (req, res, next) => {
   passport.authenticate('local', (err, user, info) => {
     if (err) { return next(err); }
-    if (!user) {return res.redirect('http://tacospin.com');}
+    if (!user) {return res.redirect('http://www.tacospin.com');}
     req.logIn(user, (err) => {
       if (err){ return next(err); }
       return res.render('dashboard');
