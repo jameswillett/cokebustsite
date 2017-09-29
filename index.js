@@ -1,19 +1,15 @@
-const express = require("express");
-const app = express();
-
-const md5 = require('md5');
-
-const passport = require('passport');
-
-const bodyParser = require("body-parser");
-app.use(bodyParser.urlencoded({ extended: true }));
-
-const jsonParser = bodyParser.json();
-
-const { Pool } = require('pg');
+const express = require( 'express' );
+const app = express( );
+const cookieParser = require( 'cookie-parser' );
+const expressSession = require( 'express-session' );
+const md5 = require( 'md5' );
+const passport = require( 'passport' );
+const LocalStrategy = require( 'passport-local' ).Strategy;
+const bcrypt = require( 'bcrypt' );
+const bodyParser = require( 'body-parser' );
+const { Pool } = require( 'pg' );
 
 const connectionString = process.env.DATABASE_URL || 'postgresql://James:@localhost:5432/James'
-
 const pool = new Pool ({
   connectionString: connectionString
 })
@@ -21,11 +17,39 @@ const pool = new Pool ({
 const hashed = '8ba3c1c2ef2db1de81f6fcbdca54c3e0';
 var clicks = 0;
 
-
 app.set('view engine', 'ejs')
 app.set('views', `${__dirname}/views/`)
 
-app.use(express.static('public'));
+app.use(express.static( 'public' ));
+app.use(cookieParser());
+app.use(expressSession({ secret: 'some bs' }));
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.use(new LocalStrategy((username, password, done) => {
+  pool.query('select username, hashedpw from users where username = $1',[username],(err,user) => {
+    if ( user.rows.length == 0 ){
+      done(null, false, {error: 'no user'})
+    } else {
+      bcrypt.compare( password, user.rows[0].hashedpw, (err, result) => {
+        if(!result){
+          done( null, false, {error:'bad pw'} )
+        } else {
+          done( null, user.rows[0] )
+        }
+      })
+    }
+  })
+}))
+
+passport.serializeUser((user, done) => {
+  done(null, user)
+})
+
+passport.deserializeUser((user, done) => {
+  //console.log(user)
+})
 
 app.get('/', (req, res) => {
   pool.query('select * from hits', (err, hits) => {
@@ -287,12 +311,38 @@ app.get('/admin', (req,res) => {
   res.render('login');
 })
 
-app.post('/dashboard', (req,res) => {
-  if( md5(req.body.password) == hashed ){
-    res.render('dashboard')
-  } else {
-    res.redirect('http://tacospin.com')
-  }
+app.post('/dashboard', (req, res, next) => {
+  passport.authenticate('local', (err, user, info) => {
+    if (err) { return next(err); }
+    if (!user) {return res.redirect('http://tacospin.com');}
+    req.logIn(user, (err) => {
+      if (err){ return next(err); }
+      return res.render('dashboard');
+    })
+  })(req, res, next);
+})
+
+app.get('/supersecretpage', (req, res) => {
+  res.render('secret');
+})
+
+app.post('/newUser', (req, res) => {
+  pool.query('select * from users where username=$1',[req.body.username],(err, joint) => {
+    console.log(joint.rows)
+    if(joint.rows.length!=0){
+      res.send('username is already taken, asshole')
+    } else {
+      bcrypt.hash(req.body.password, 10, (err, hash) =>{
+        console.log(hash)
+        pool.query('insert into users (username, hashedpw) values ($1, $2)',[req.body.username, hash], (err, joint) => {
+          if (err){
+            console.log(err)
+          }
+          res.render('login')
+        })
+      })
+    }
+  })
 })
 
 app.post('/postNews', (req,res) => {
