@@ -269,9 +269,9 @@ app.get('/releases/:id', (req, res) => {
       if (err2){
         console.log(err2)
       }
-      var listOfOthers = [];
-      others.rows.map(other => {
-        listOfOthers.push({name:other.name,id:other.id})
+      
+      const listOfOthers = others.rows.map(other => {
+        return {name:other.name,id:other.id}
       })
 
       const parseTracklist = (tracks) => {
