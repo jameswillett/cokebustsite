@@ -195,7 +195,7 @@ app.post('/postComment', (req, res) => {
   if (commentCheck.test(req.body.content)){
     res.redirect('http://www.tacospin.com');
   }
-  pool.query('insert into guestbook (author, content, ip) values ($1, $2, $3)',[req.body.author, sanitizeHtml(req.body.content), ip], (err, comment) => {
+  pool.query('insert into guestbook (author, content, ip) values ($1, $2, $3)', [req.body.author, sanitizeHtml(req.body.content), ip], (err, comment) => {
     if (err){
       console.log(err)
     }
@@ -277,14 +277,14 @@ app.get('/releases/:id', (req, res) => {
       const parseTracklist = (tracks) => {
         var parsed = [];
         var bucket = '';
-        tracks.split('').map(char => {
+        for (let char of tracks) {
           if (char != ','){
             bucket += char;
           } else {
             parsed.push(String(bucket));
             bucket = '';
           }
-        })
+        }
         parsed.push(String(bucket));
         return parsed;
       }
