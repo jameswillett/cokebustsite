@@ -7,10 +7,10 @@
   <body>
     <div id='admin'>
       <h1>Add News</h1>
-      <form id='form' method="post" action='/postNews'>
-        Author: <input type='text' name='author' value='<%= user.username %>' required disabled><br />
+      <form id='form' method="post" action="/postNews">
+        Author: <input type='text' name='author' value='<%= user.username %>' required><br />
         Content: <textarea name='content' form='form' required></textarea>
-        <input type='submit'>
+        <input type='submit' id='submitButton'>
       </form>
     </div>
     <script>

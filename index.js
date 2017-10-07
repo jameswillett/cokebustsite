@@ -37,7 +37,7 @@ passport.use(new LocalStrategy((username, password, done) => {
       done(null, false, {error: 'no user'})
     } else {
       bcrypt.compare( password, user.rows[0].hashedpw, (err, result) => {
-        if(!result){
+        if( !result ){
           done( null, false, {error:'bad pw'} )
         } else {
           done( null, user.rows[0] )
@@ -52,7 +52,7 @@ passport.serializeUser((user, done) => {
 })
 
 passport.deserializeUser((user, done) => {
-  //console.log(user)
+  done(null, user)
 })
 
 app.get('/', (req, res) => {
@@ -311,7 +311,7 @@ app.get('/admin', (req,res) => {
   res.render('login');
 })
 
-app.post('/dashboard', (req, res, next) => {
+app.all('/dashboard', (req, res, next) => {
   passport.authenticate('local', (err, user, info) => {
     if (err) {
       return next(err);
@@ -325,10 +325,11 @@ app.post('/dashboard', (req, res, next) => {
       if (err){
         return next(err);
       }
-      return res.render('dashboard', {
+      res.render('dashboard', {
         user: user
       });
     })
+
   })(req, res, next);
 })
 
@@ -359,13 +360,20 @@ app.post('/newUser', (req, res) => {
   })
 })
 
-app.post('/postNews', (req,res) => {
+app.post('/postNews', (req, res, next) => {
+  console.log(req.body)
   pool.query('insert into news (author, content) values ($1, $2)',[req.body.author, req.body.content], (err, news) => {
     if (err){
       console.log(err)
     }
-    res.render('dashboard')
   })
+  res.render('dashboard',{
+    user: req.body.author
+  })
+})
+
+app.post('/postNews2', (req, res, next) => {
+  app.send('ayy')
 })
 
 const listener = app.listen(process.env.PORT || 3000, () => {
