@@ -308,7 +308,8 @@ app.get('/releases/:id', (req, res) => {
 })
 
 app.get('/admin', (req,res) => {
-  res.render('login');
+  res.redirect('http://tacospin.com')
+  //res.render('login');
 })
 
 app.post('/dashboard', (req, res, next) => {
