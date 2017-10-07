@@ -167,6 +167,7 @@ ul {
   padding: 1em;
   align-self: center;
   vertical-align: top;
+  max-width: 30%;
 }
 
 #tracklist{

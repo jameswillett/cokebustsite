@@ -258,7 +258,6 @@ app.get('/releases', (req, res) => {
 })
 
 app.get('/releases/:id', (req, res) => {
-  console.log(click);
   const id = req.params.id;
   pool.query('select * from releases where id=$1',[id], (err, release) => {
     if (err){
@@ -269,9 +268,12 @@ app.get('/releases/:id', (req, res) => {
       if (err2){
         console.log(err2)
       }
-      
+
       const listOfOthers = others.rows.map(other => {
-        return {name:other.name,id:other.id}
+        return {
+          name:other.name,
+          id:other.id
+        }
       })
 
       const parseTracklist = (tracks) => {
@@ -297,11 +299,8 @@ app.get('/releases/:id', (req, res) => {
 
       res.render('release', {
         title: selected.name,
-        year: selected.year,
-        name: selected.name,
-        imgsrc: `/${selected.imgsrc}`,
+        release: selected,
         otherVersions: listOfOthers,
-        tracklist: selected.tracklist,
         clicks: click
       })
     })
