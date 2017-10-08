@@ -325,8 +325,8 @@ app.all('/dashboard', (req, res, next) => {
       if (err){
         return next(err);
       }
-      pool.query('select hashedpw from users where username = $1', ['dummy'] , (err, dummyresult) => {
-        bcrypt.compare('D4m4g3dC!ty', req.session.passport.user.hashedpw, (err, result) => {
+      pool.query('select hashedpw from users where username = $1', ['dummyplaintext'] , (err, dummyresult) => {
+        bcrypt.compare(dummyresult.rows[0].hashedpw, req.session.passport.user.hashedpw, (err, result) => {
           if (result){
             console.log('you need to change your password')
             res.render('changepw',{
@@ -345,42 +345,11 @@ app.all('/dashboard', (req, res, next) => {
 })
 
 app.post('/resetPW', (req, res) => {
-  console.log(req.body)
   const user = req.session.passport.user.username;
-
   bcrypt.hash(req.body.password, 10, (err, hash) => {
     pool.query('update users set hashedpw = $1 where username = $2', [hash, user], (err) => {
       res.redirect('/admin')
     })
-  })
-})
-
-app.get('/supersecretpage', (req, res) => {
-  var errMsg = '';
-  if( req.query.err ){
-    errMsg = 'that username is already taken, dingus!';
-  }
-  res.render('secret',{
-    errz:errMsg
-  });
-})
-
-
-
-app.post('/newUser', (req, res) => {
-  pool.query('select * from users where username=$1',[req.body.username],(err, joint) => {
-    if( joint.rows.length != 0 ){
-      res.redirect('/supersecretpage?err=1')
-    } else {
-      bcrypt.hash(req.body.password, 10, (err, hash) =>{
-        pool.query('insert into users (username, hashedpw) values ($1, $2)',[req.body.username, hash], (err, joint) => {
-          if (err){
-            console.log(err)
-          }
-          res.render('login')
-        })
-      })
-    }
   })
 })
 
@@ -390,14 +359,9 @@ app.post('/postNews', (req, res, next) => {
       console.log(err)
     }
   })
-  console.log(req.isAuthenticated())
   res.render('dashboard',{
     user: req.session.passport.user
   })
-})
-
-app.post('/postNews2', (req, res, next) => {
-  app.send('ayy')
 })
 
 const listener = app.listen(process.env.PORT || 3000, () => {
