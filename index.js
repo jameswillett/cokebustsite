@@ -325,12 +325,34 @@ app.all('/dashboard', (req, res, next) => {
       if (err){
         return next(err);
       }
-      res.render('dashboard', {
-        user: user
-      });
+      pool.query('select hashedpw from users where username = $1', ['dummy'] , (err, dummyresult) => {
+        bcrypt.compare('D4m4g3dC!ty', req.session.passport.user.hashedpw, (err, result) => {
+          if (result){
+            console.log('you need to change your password')
+            res.render('changepw',{
+              user: req.session.passport.user
+            })
+          } else {
+            console.log('you have a good password')
+            res.render('dashboard', {
+              user: user
+            })
+          }
+        })
+      })
     })
-
   })(req, res, next);
+})
+
+app.post('/resetPW', (req, res) => {
+  console.log(req.body)
+  const user = req.session.passport.user.username;
+
+  bcrypt.hash(req.body.password, 10, (err, hash) => {
+    pool.query('update users set hashedpw = $1 where username = $2', [hash, user], (err) => {
+      res.redirect('/admin')
+    })
+  })
 })
 
 app.get('/supersecretpage', (req, res) => {
@@ -342,6 +364,8 @@ app.get('/supersecretpage', (req, res) => {
     errz:errMsg
   });
 })
+
+
 
 app.post('/newUser', (req, res) => {
   pool.query('select * from users where username=$1',[req.body.username],(err, joint) => {
@@ -361,14 +385,14 @@ app.post('/newUser', (req, res) => {
 })
 
 app.post('/postNews', (req, res, next) => {
-  console.log(req.body)
   pool.query('insert into news (author, content) values ($1, $2)',[req.body.author, req.body.content], (err, news) => {
     if (err){
       console.log(err)
     }
   })
+  console.log(req.isAuthenticated())
   res.render('dashboard',{
-    user: req.body.author
+    user: req.session.passport.user
   })
 })
 
