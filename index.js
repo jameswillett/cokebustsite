@@ -244,15 +244,11 @@ app.get('/releases', (req, res) => {
 
 app.get('/releases/:id', (req, res) => {
   const id = req.params.id;
-  pool.query('select * from releases where id=$1',[id], (err, release) => {
-    if (err){
-      console.log(err);
-    }
+  pool.query('select * from releases where id=$1',[id])
+  .then(release => {
     const selected = release.rows[0];
-    pool.query('select * from releases where meta=$1 and id!=$2',[selected.meta, selected.id], (err2, others) => {
-      if (err2){
-        console.log(err2);
-      }
+    pool.query('select * from releases where meta=$1 and id!=$2',[selected.meta, selected.id])
+    .then(others => {
 
       const listOfOthers = others.rows.map(other => {
         return { name:other.name, id:other.id };
@@ -285,8 +281,9 @@ app.get('/releases/:id', (req, res) => {
         otherVersions: listOfOthers,
         clicks: click
       });
-    });
-  });
+    })
+  })
+  .catch(console.log)
 });
 
 app.get('/admin', (req,res) => {
