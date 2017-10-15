@@ -55,7 +55,7 @@ passport.deserializeUser((user, done) => {
   done(null, user);
 });
 
-app.get('/', async (req, res) => {
+app.get('/', (req, res) => {
   pool.query('select * from hits')
   .then(hits => {
     const hit = hits.rows[0].hits;
