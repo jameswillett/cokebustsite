@@ -36,7 +36,7 @@ app.use((req, res, next) => {
      req.connection.remoteAddress ||
      req.socket.remoteAddress ||
      req.connection.socket.remoteAddress;
-  if (ip == '96.68.239.225'){
+  if (ip.toString() == '38.88.33.66'){
     res.redirect('http://www.tacospin.com')
   }
   next();
