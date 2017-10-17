@@ -72,7 +72,6 @@ app.get('/news', async (req, res) => {
   const max = min + 5;
   try {
     const news = await pool.query('select * from news order by id desc')
-
     const filteredNews = news.rows.map((entry, index) => {
       return {index, author: entry.author, content:entry.content, date:entry.date};
     }).filter(entry => {
