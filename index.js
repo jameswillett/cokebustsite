@@ -31,6 +31,17 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use((req, res, next) => {
+  var ip = req.headers['x-forwarded-for'] ||
+     req.connection.remoteAddress ||
+     req.socket.remoteAddress ||
+     req.connection.socket.remoteAddress;
+  if (ip == '96.68.239.225'){
+    res.redirect('http://www.tacospin.com')
+  }
+  next();
+})
+
 passport.use(new LocalStrategy( async (username, password, done) => {
   try {
     const user = await pool.query('select username, hashedpw from users where username = $1',[username])
@@ -76,10 +87,10 @@ app.get('/news', async (req, res) => {
   try {
     const news = await pool.query('select * from news order by id desc')
 
-    const filteredNews = news.rows.map((entry, index) => {
-      return {index, author: entry.author, content:entry.content, date:entry.date};
+    const filteredNews = news.rows.map((entry , index) => {
+      return {index, author: entry .author, content:entry .content, date:entry .date};
     }).filter(entry => {
-      return entry.index >= min && entry.index < max;
+      return entry .index >= min && entry .index < max;
     });
 
     res.render('news', {
@@ -100,12 +111,12 @@ app.get('/news', async (req, res) => {
 app.get('/news/:id', async (req, res) => {
   const min = req.params.id*5;
   const max = min + 5;
-  try{
+  try {
     const news = await pool.query('select * from news order by id desc')
-    const filteredNews = news.rows.map((entry, index) => {
-      return {index, author: entry.author, content:entry.content, date:entry.date};
+    const filteredNews = news.rows.map((entry , index) => {
+      return {index, author: entry .author, content:entry .content, date:entry .date};
     }).filter(entry => {
-      return entry.index >= min && entry.index < max;
+      return entry .index >= min && entry .index < max;
     });
 
     var prev = parseInt(req.params.id)-1;
@@ -130,12 +141,12 @@ app.get('/news/:id', async (req, res) => {
 app.get('/guestbook', async (req,res) => {
   const min = 0;
   const max = 10;
-  try{
+  try {
     const data = await pool.query('select * from guestbook order by id desc')
-    const filteredComments = data.rows.map((entry, index) => {
-      return {index, author: entry.author, content: entry.content, date: entry.date};
+    const filteredComments = data.rows.map((entry , index) => {
+      return {index, author: entry .author, content: entry .content, date: entry .date};
     }).filter(entry => {
-      return entry.index >= min && entry.index < max;
+      return entry .index >= min && entry .index < max;
     });
 
     res.render('guestbook',{
@@ -147,7 +158,7 @@ app.get('/guestbook', async (req,res) => {
       totalEntries: data.rows.length,
       clicks: click
     });
-  } catch(err) {
+  } catch (err) {
     console.log(err)
   }
 });
@@ -157,11 +168,10 @@ app.get('/guestbook/:id', async (req,res) => {
   const max = min + 10;
   try {
     const data = await pool.query('select * from guestbook order by id desc')
-
-    const filteredComments = data.rows.map((entry, index) => {
-      return {index, author: entry.author, content: entry.content, date: entry.date, id: entry.id};
+    const filteredComments = data.rows.map((entry , index) => {
+      return {index, author: entry .author, content: entry .content, date: entry .date, id: entry .id};
     }).filter(entry => {
-      return entry.index >= min && entry.index < max;
+      return entry .index >= min && entry .index < max;
     });
 
     var prev = parseInt(req.params.id)-1;
@@ -178,7 +188,7 @@ app.get('/guestbook/:id', async (req,res) => {
       totalEntries: data.rows.length,
       clicks: click
     });
-  } catch(err) {
+  } catch (err) {
     console.log(err)
   }
 });
@@ -203,14 +213,14 @@ app.post('/postComment', async (req, res) => {
 });
 
 app.get('/shows', async (req, res) => {
-  try{
+  try {
     const shows = await pool.query('select * from shows where date + 2 >= now() order by date asc')
     res.render('shows', {
       title: 'Shows',
       shows: shows.rows,
       clicks: click
     });
-  } catch(err) {
+  } catch (err) {
     console.log(err)
   }
 });
@@ -223,7 +233,7 @@ app.get('/showarchive', async (req, res) => {
       shows: shows.rows,
       clicks: click
     });
-  } catch(err) {
+  } catch (err) {
     console.log(err)
   }
 });
@@ -256,7 +266,7 @@ app.get('/releases', async (req, res) => {
 });
 
 app.get('/releases/:id', async (req, res) => {
-  try{
+  try {
     const { id } = req.params;
     const release = await pool.query('select * from releases where id=$1',[id])
     const [{  meta, name, year, story,
@@ -279,7 +289,7 @@ app.get('/releases/:id', async (req, res) => {
       clicks: click
     });
 
-  } catch(err) {
+  } catch (err) {
     console.log(err)
   }
 
@@ -317,7 +327,7 @@ app.post('/dashboard', (req, res, next) => {
             });
           }
         });
-      } catch(err) {
+      } catch (err) {
         console.log(err)
       }
     });
@@ -327,7 +337,7 @@ app.post('/dashboard', (req, res, next) => {
 app.post('/resetPW', (req, res) => {
   const user = req.session.passport.user.username;
   bcrypt.hash(req.body.password, 10, async (err, hash) => {
-    try{
+    try {
     await pool.query('update users set hashedpw = $1 where username = $2', [hash, user])
     res.redirect('/admin');
     } catch (err){
@@ -342,7 +352,7 @@ app.post('/postNews', async (req, res) => {
     res.render('dashboard',{
       user: req.session.passport.user
     });
-  } catch(err) {
+  } catch (err) {
     console.log(err)
   }
 });
