@@ -1,30 +1,30 @@
 <% include partials/header %>
   <div id='content'>
-    <div id='releaseHeader'><%= release.name %> (<%= release.year %>)</div>
+    <div id='releaseHeader'><%= name %> (<%= year %>)</div>
     <div class='releaseInfo'>
-      <div><img id='releaseLarge' src='/<%= release.imgsrc %>'></div>
+      <div><img id='releaseLarge' src='/<%= imgsrc %>'></div>
     </div>
-    <% if (release.story){ %>
-      <div class='releaseInfo'><p><%= release.story %></div>
+    <% if (story){ %>
+      <div class='releaseInfo'><p><%= story %></div>
     <% } %>
     <div class='releaseInfo'>
       <ol id='tracklist'>
-        <% release.tracklist.map(track => { %>
+        <% tracklist.map(track => { %>
           <li><%= track %></li>
         <% }) %>
       </ol>
-      Label: <%= release.label %><br />
-      
-      <% if (release.format){ %>
-        Format: <%= release.format %><br />
+      Label: <%= label %><br />
+
+      <% if (format){ %>
+        Format: <%= format %><br />
       <% } %>
 
-      <% if (release.recorded){ %>
-        Recorded By: <%= release.recorded %><br />
+      <% if (recorded){ %>
+        Recorded By: <%= recorded %><br />
       <% } %>
 
-      <% if (release.mastered){ %>
-        Mastered By: <%= release.mastered %><br />
+      <% if (mastered){ %>
+        Mastered By: <%= mastered %><br />
       <% } %>
 
       <% if (otherVersions.length) { %>

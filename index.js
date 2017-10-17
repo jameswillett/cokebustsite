@@ -31,8 +31,9 @@ app.use((req, res, next) => {
   next();
 });
 
-passport.use(new LocalStrategy((username, password, done) => {
-  pool.query('select username, hashedpw from users where username = $1',[username],(err,user) => {
+passport.use(new LocalStrategy( async (username, password, done) => {
+  try {
+    const user = await pool.query('select username, hashedpw from users where username = $1',[username])
     if ( user.rows.length == 0 ){
       done(null, false, {error: 'no user'});
     } else {
@@ -44,7 +45,9 @@ passport.use(new LocalStrategy((username, password, done) => {
         }
       });
     }
-  });
+  } catch (err) {
+    console.log(err)
+  }
 }));
 
 passport.serializeUser((user, done) => {
@@ -55,23 +58,27 @@ passport.deserializeUser((user, done) => {
   done(null, user);
 });
 
-app.get('/', (req, res) => {
-  pool.query('select * from hits')
-  .then(hits => {
-    const hit = hits.rows[0].hits;
+app.get('/', async (req, res) => {
+  try {
+    const hitQ = await pool.query('select * from hits')
+
+    const { hits } = hitQ.rows[0];
     res.render('index',{
-      hits: hit
+      hits
     });
-  })
-  .catch(console.log)
-  .then(pool.query('update hits set hits = hits+1'))
+
+    const inc = await pool.query('update hits set hits = hits+1')
+  } catch (err) {
+    console.log(err)
+  }
 });
 
-app.get('/news',(req, res) => {
+app.get('/news', async (req, res) => {
   const min = 0;
   const max = min + 5;
-  pool.query('select * from news order by id desc')
-  .then(news => {
+  try {
+    const news = await pool.query('select * from news order by id desc')
+
     const filteredNews = news.rows.map((entry, index) => {
       return {index, author: entry.author, content:entry.content, date:entry.date};
     }).filter(entry => {
@@ -87,15 +94,17 @@ app.get('/news',(req, res) => {
       totalEntries: news.rows.length,
       clicks: click
     });
-  })
-  .catch(console.log)
+  } catch (err) {
+    console.log(err)
+  }
+
 });
 
-app.get('/news/:id',(req, res) => {
+app.get('/news/:id', async (req, res) => {
   const min = req.params.id*5;
   const max = min + 5;
-  pool.query('select * from news order by id desc')
-  .then(news => {
+  try{
+    const news = await pool.query('select * from news order by id desc')
     const filteredNews = news.rows.map((entry, index) => {
       return {index, author: entry.author, content:entry.content, date:entry.date};
     }).filter(entry => {
@@ -116,16 +125,16 @@ app.get('/news/:id',(req, res) => {
       totalEntries: news.rows.length,
       clicks: click
     });
-  })
-  .catch(console.log)
+  } catch (err){
+    console.log(err)
+  }
 });
 
-app.get('/guestbook', (req,res) => {
+app.get('/guestbook', async (req,res) => {
   const min = 0;
   const max = 10;
-
-  pool.query('select * from guestbook order by id desc')
-  .then(data => {
+  try{
+    const data = await pool.query('select * from guestbook order by id desc')
     const filteredComments = data.rows.map((entry, index) => {
       return {index, author: entry.author, content: entry.content, date: entry.date};
     }).filter(entry => {
@@ -141,16 +150,17 @@ app.get('/guestbook', (req,res) => {
       totalEntries: data.rows.length,
       clicks: click
     });
-  })
-  .catch(console.log)
+  } catch(err) {
+    console.log(err)
+  }
 });
 
-app.get('/guestbook/:id', (req,res) => {
+app.get('/guestbook/:id', async (req,res) => {
   const min = req.params.id * 10;
   const max = min + 10;
+  try {
+    const data = await pool.query('select * from guestbook order by id desc')
 
-  pool.query('select * from guestbook order by id desc')
-  .then(data => {
     const filteredComments = data.rows.map((entry, index) => {
       return {index, author: entry.author, content: entry.content, date: entry.date, id: entry.id};
     }).filter(entry => {
@@ -171,11 +181,12 @@ app.get('/guestbook/:id', (req,res) => {
       totalEntries: data.rows.length,
       clicks: click
     });
-  })
-  .catch(console.log)
+  } catch(err) {
+    console.log(err)
+  }
 });
 
-app.post('/postComment', (req, res) => {
+app.post('/postComment', async (req, res) => {
   var ip = req.headers['x-forwarded-for'] ||
      req.connection.remoteAddress ||
      req.socket.remoteAddress ||
@@ -185,35 +196,39 @@ app.post('/postComment', (req, res) => {
   if (commentCheck.test(req.body.content)){
     res.redirect('http://www.tacospin.com');
   }
-  pool.query('insert into guestbook (author, content, ip) values ($1, $2, $3)', [req.body.author, sanitizeHtml(req.body.content), ip])
-  .then(() => {
+  try {
+    await pool.query('insert into guestbook (author, content, ip) values ($1, $2, $3)', [req.body.author, sanitizeHtml(req.body.content), ip])
     console.log(`${req.body.author} posted from ${ip} : ${req.body.content}`)
     res.redirect('/guestbook');
-  })
+  } catch (err){
+    console.log(err)
+  }
 });
 
-app.get('/shows', (req, res) => {
-  pool.query('select * from shows where date + 2 >= now() order by date asc')
-  .then(shows => {
+app.get('/shows', async (req, res) => {
+  try{
+    const shows = await pool.query('select * from shows where date + 2 >= now() order by date asc')
     res.render('shows', {
       title: 'Shows',
       shows: shows.rows,
       clicks: click
     });
-  })
-  .catch(console.log)
+  } catch(err) {
+    console.log(err)
+  }
 });
 
-app.get('/showarchive', (req, res) => {
-  pool.query('select * from shows order by date desc')
-  .then(shows => {
+app.get('/showarchive', async (req, res) => {
+  try {
+    const shows = await pool.query('select * from shows order by date desc')
     res.render('showarchive', {
       title: 'Show Archive',
       shows: shows.rows,
       clicks: click
     });
-  })
-  .catch(console.log)
+  } catch(err) {
+    console.log(err)
+  }
 });
 
 app.get('/store', (req, res) => {
@@ -230,61 +245,49 @@ app.get('/about', (req, res) => {
   });
 });
 
-app.get('/releases', (req, res) => {
-  pool.query('select * from releases order by year desc, name desc')
-  .then(releases => {
+app.get('/releases', async (req, res) => {
+  try {
+    const releases = await pool.query('select * from releases order by year desc, name desc')
     res.render('releases', {
       title: 'Releases & Discography',
       data: releases.rows,
       clicks: click
     });
-  })
-  .catch(console.log)
+  } catch (err) {
+    console.log(err)
+  }
 });
 
-app.get('/releases/:id', (req, res) => {
-  const id = req.params.id;
-  pool.query('select * from releases where id=$1',[id])
-  .then(release => {
-    const selected = release.rows[0];
-    pool.query('select * from releases where meta=$1 and id!=$2',[selected.meta, selected.id])
-    .then(others => {
+app.get('/releases/:id', async (req, res) => {
+  try{
+    const { id } = req.params;
+    const release = await pool.query('select * from releases where id=$1',[id])
+    const [{  meta, name, year, story,
+              label, format, recorded,
+              mastered, imgsrc, tracklist: unparsedTracklist = []
+          }] = release.rows
+    const others = await pool.query('select * from releases where meta=$1 and id!=$2',[meta, id])
 
-      const listOfOthers = others.rows.map(other => {
-        return { name:other.name, id:other.id };
-      });
+    const listOfOthers = others.rows.map(other => {
+      return { name:other.name, id:other.id };
+    });
 
-      const parseTracklist = (tracks) => {
-        var parsed = [];
-        var bucket = '';
-        for (let char of tracks) {
-          if (char != ','){
-            bucket += char;
-          } else {
-            parsed.push(String(bucket));
-            bucket = '';
-          }
-        }
-        parsed.push(String(bucket));
-        return parsed;
-      };
+    const parsedTracklist = unparsedTracklist.split(',')
 
-      if (selected.tracklist){
-        selected.tracklist = parseTracklist(selected.tracklist);
-      } else {
-        selected.tracklist = [];
-      }
+    res.render('release', {
+      title: name,
+      meta, name, year, story, label, format, recorded, mastered, imgsrc,
+      tracklist: parsedTracklist,
+      otherVersions: listOfOthers,
+      clicks: click
+    });
 
-      res.render('release', {
-        title: selected.name,
-        release: selected,
-        otherVersions: listOfOthers,
-        clicks: click
-      });
-    })
-  })
-  .catch(console.log)
-});
+  } catch(err) {
+    console.log(err)
+  }
+
+
+})
 
 app.get('/admin', (req,res) => {
   res.render('login');
@@ -300,12 +303,12 @@ app.post('/dashboard', (req, res, next) => {
       return res.redirect('http://www.tacospin.com');
     }
 
-    req.logIn(user, (err) => {
+    req.logIn(user, async (err) => {
       if (err){
         return next(err);
       }
-      pool.query('select hashedpw from users where username = $1', ['dummyplaintext'])
-      .then(dummyresult => {
+      try {
+        const dummyresult = await pool.query('select hashedpw from users where username = $1', ['dummyplaintext'])
         bcrypt.compare(dummyresult.rows[0].hashedpw, req.session.passport.user.hashedpw, (err, result) => {
           if (result){
             res.render('changepw', {
@@ -317,31 +320,34 @@ app.post('/dashboard', (req, res, next) => {
             });
           }
         });
-      })
-      .catch(console.log)
+      } catch(err) {
+        console.log(err)
+      }
     });
   })(req, res, next);
 });
 
 app.post('/resetPW', (req, res) => {
   const user = req.session.passport.user.username;
-  bcrypt.hash(req.body.password, 10, (err, hash) => {
-    pool.query('update users set hashedpw = $1 where username = $2', [hash, user])
-    .then(() => {
-      res.redirect('/admin');
-    })
-    .catch(console.log)
-  });
-});
+  bcrypt.hash(req.body.password, 10, async (err, hash) => {
+    try{
+    await pool.query('update users set hashedpw = $1 where username = $2', [hash, user])
+    res.redirect('/admin');
+    } catch (err){
+      console.log(err)
+    };
+  })
+})
 
-app.post('/postNews', (req, res) => {
-  pool.query('insert into news (author, content) values ($1, $2)',[req.body.author, req.body.content])
-  .then(() => {
+app.post('/postNews', async (req, res) => {
+  try {
+    await pool.query('insert into news (author, content) values ($1, $2)',[req.body.author, req.body.content])
     res.render('dashboard',{
       user: req.session.passport.user
     });
-  })
-  .catch(console.log)
+  } catch(err) {
+    console.log(err)
+  }
 });
 
 const listener = app.listen(process.env.PORT || 3000, () => {
