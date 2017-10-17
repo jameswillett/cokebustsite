@@ -14,7 +14,7 @@ const connectionString = process.env.DATABASE_URL || 'postgresql://James:@localh
 const pool = new Pool ({
   connectionString: connectionString
 });
-
+/*
 var user = new ConnectRoles({
   failureHandler: function (req, res, action) {
     // optional function to customise code that runs when
@@ -28,6 +28,7 @@ var user = new ConnectRoles({
     }
   }
 });
+*/
 
 let click;
 
