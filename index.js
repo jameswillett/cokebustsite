@@ -6,12 +6,27 @@ const app = express( );
 const expressSession = require( 'express-session' );
 const LocalStrategy = require( 'passport-local' ).Strategy;
 const passport = require( 'passport' );
+const ConnectRoles = require( 'connect-roles' );
 const sanitizeHtml = require('sanitize-html');
 const { Pool } = require( 'pg' );
 
 const connectionString = process.env.DATABASE_URL || 'postgresql://James:@localhost:5432/James';
 const pool = new Pool ({
   connectionString: connectionString
+});
+
+var user = new ConnectRoles({
+  failureHandler: function (req, res, action) {
+    // optional function to customise code that runs when
+    // user fails authorisation
+    var accept = req.headers.accept || '';
+    res.status(403);
+    if (~accept.indexOf('html')) {
+      res.render('access-denied', {action: action});
+    } else {
+      res.send('Access Denied - You don\'t have permission to: ' + action);
+    }
+  }
 });
 
 let click;
@@ -36,7 +51,7 @@ app.use((req, res, next) => {
      req.connection.remoteAddress ||
      req.socket.remoteAddress ||
      req.connection.socket.remoteAddress;
-  if (ip.toString() == '38.88.33.66'){
+  if (ip.toString() == '96.68.239.225'){
     res.redirect('http://www.tacospin.com')
   }
   next();
