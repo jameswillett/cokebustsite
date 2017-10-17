@@ -31,8 +31,9 @@ app.use((req, res, next) => {
   next();
 });
 
-passport.use(new LocalStrategy((username, password, done) => {
-  pool.query('select username, hashedpw from users where username = $1',[username],(err,user) => {
+passport.use(new LocalStrategy( async (username, password, done) => {
+  try {
+    const user = await pool.query('select username, hashedpw from users where username = $1',[username])
     if ( user.rows.length == 0 ){
       done(null, false, {error: 'no user'});
     } else {
@@ -44,7 +45,9 @@ passport.use(new LocalStrategy((username, password, done) => {
         }
       });
     }
-  });
+  } catch (err) {
+    console.log(err)
+  }
 }));
 
 passport.serializeUser((user, done) => {
@@ -72,6 +75,7 @@ app.get('/news', async (req, res) => {
   const max = min + 5;
   try {
     const news = await pool.query('select * from news order by id desc')
+
     const filteredNews = news.rows.map((entry, index) => {
       return {index, author: entry.author, content:entry.content, date:entry.date};
     }).filter(entry => {
