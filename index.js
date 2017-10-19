@@ -415,7 +415,7 @@ app.post('/addUser', userRole.is('superuser!'), async (req, res) => {
 
     transporter.sendMail(mailOptions, function(error, info){
       if (error) {
-        res.send(error);
+        return res.send(error);
       } else {
         pool.query('insert into users (username, name, email, role, hashedpw) values ($1, $2, $3, $4, $5)',[userName, displayName, userEmail, role, hashedRandomPassword])
         console.log('Email sent: ' + info.response);
@@ -427,7 +427,7 @@ app.post('/addUser', userRole.is('superuser!'), async (req, res) => {
     console.log(err)
   }
 
-  res.render('dashboard',{
+  return res.render('dashboard',{
     user: req.session.passport.user
   });
 })
