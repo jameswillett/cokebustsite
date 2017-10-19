@@ -6,12 +6,17 @@
   </head>
   <body>
     <div id='admin'>
-      <h1>Add News</h1>
-      <form id='form' method="post" action="/postNews">
-        Author: <input type='text' name='author' value='<%= user.name %>' required><br />
-        Content: <textarea name='content' form='form' required></textarea>
-        <input type='submit' id='submitButton'>
-      </form>
+      <% if (user.role == 'chetan')  { %>
+        <h1> this is as far as you go chetan </h1>
+      <% } %>
+      <% if (user.role == 'superuser!' || user.role == 'superuser!'){ %>
+        <h1>Add News</h1>
+        <form id='form' method="post" action="/postNews">
+          Author: <input type='text' name='author' value='<%= user.name %>' required><br />
+          Content: <textarea name='content' form='form' required></textarea>
+          <input type='submit' id='submitButton'>
+        </form>
+      <% } %>
       <% if (user.role == 'superuser!'){ %>
         <h1>YOU ARE A SUPERUSER</h1>
         <h1>Add User</h1>
@@ -26,6 +31,7 @@
              <select name='role'>
                <option value = "pleb">pleb</option>
                <option value = "superuser!">superuser!</option>
+               <option value = "chetan">chetan</option>
              </select><br />
           YOUR email password: <input type='password' name='yourPassword' required>
           <input type='submit' id='submitButton'>
