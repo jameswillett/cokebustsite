@@ -337,7 +337,7 @@ app.post('/dashboard', (req, res, next) => {
     }
 
     if (!user) {
-      return res.redirect('http://www.tacospin.com');
+      res.redirect('http://www.tacospin.com');
     }
 
     req.logIn(user, async (err) => {
@@ -348,7 +348,7 @@ app.post('/dashboard', (req, res, next) => {
         const { rows: [{ loggedin }] } = await pool.query('select loggedin from users where username = $1',[req.session.passport.user.username])
         console.log(loggedin)
         if (!loggedin){
-          return res.render('changepw', {
+          res.render('changepw', {
             user: user
           });
         } else {
