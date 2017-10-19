@@ -10,6 +10,7 @@ const ConnectRoles = require( 'connect-roles' );
 const sanitizeHtml = require('sanitize-html');
 const randomstring = require( 'randomstring' );
 const nodemailer = require( 'nodemailer' );
+const smtpTransport = require( 'nodemailer-smtp-transport' );
 const { Pool } = require( 'pg' );
 
 
@@ -398,14 +399,13 @@ app.post('/addUser', userRole.is('superuser!'), async (req, res) => {
     const hashedRandomPassword = await bcrypt.hash(randomPassword, 10)
     const { userName, displayName, userEmail, role, yourPassword } = req.body;
 
-
-    const transporter = nodemailer.createTransport({
+    const transporter = nodemailer.createTransport(smtpTransport({
       service: 'gmail',
       auth: {
         user: req.session.passport.user.email,
         pass: yourPassword
       }
-    });
+    }));
 
     const mailOptions = {
       from: req.session.passport.user.email,
@@ -416,7 +416,7 @@ app.post('/addUser', userRole.is('superuser!'), async (req, res) => {
 
     transporter.sendMail(mailOptions, function(error, info){
       if (error) {
-        console.log(error);
+        return res.send(error);
       } else {
         pool.query('insert into users (username, name, email, role, hashedpw) values ($1, $2, $3, $4, $5)',[userName, displayName, userEmail, role, hashedRandomPassword])
         console.log('Email sent: ' + info.response);

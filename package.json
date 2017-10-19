@@ -23,6 +23,7 @@
     "googleapis": "^22.2.0",
     "md5": "^2.2.1",
     "nodemailer": "^4.2.0",
+    "nodemailer-smtp-transport": "^2.7.4",
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
     "pg": "^7.3.0",
