@@ -378,7 +378,7 @@ app.post('/resetPW', (req, res) => {
 
 app.post('/postNews', async (req, res) => {
   try {
-    await pool.query('insert into news (author, content) values ($1, $2)',[req.body.author, req.body.content])
+    await pool.query('insert into news (author, content) values ($1, $2)',[req.body.author, sanitizeHtml(req.body.content)])
     res.render('dashboard',{
       user: req.session.passport.user
     });
