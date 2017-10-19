@@ -12,6 +12,25 @@
         Content: <textarea name='content' form='form' required></textarea>
         <input type='submit' id='submitButton'>
       </form>
+      <% if (user.role == 'superuser!'){ %>
+        <h1>YOU ARE A SUPERUSER</h1>
+        <h1>Add User</h1>
+        <form method="post" action="/addUser">
+          <label>Name: </label>
+            <input type='text' name='displayName' required><br />
+          <label>Username: </label>
+            <input type='text' name='userName' required><br />
+          <label>Email: </label>
+            <input type='text' name='userEmail' required><br />
+          <label>Role: </label>
+             <select name='role'>
+               <option value = "pleb">pleb</option>
+               <option value = "superuser!">superuser!</option>
+             </select><br />
+          YOUR email password: <input type='password' name='yourPassword' required>
+          <input type='submit' id='submitButton'>
+        </form>
+      <% } %>
     </div>
     <script>
     </script>
