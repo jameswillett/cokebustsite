@@ -232,7 +232,7 @@ app.post('/postComment', async (req, res) => {
 
   var commentCheck = new RegExp('.*(<script|</html).*');
   if (commentCheck.test(req.body.content)){
-    res.redirect('http://www.tacospin.com');
+    return res.redirect('http://www.tacospin.com');
   }
   try {
     await pool.query('insert into guestbook (author, content, ip) values ($1, $2, $3)', [req.body.author, sanitizeHtml(req.body.content), ip])
@@ -347,11 +347,11 @@ app.post('/dashboard', (req, res, next) => {
         const { rows: [{ loggedin }] } = await pool.query('select loggedin from users where username = $1',[req.session.passport.user.username])
         console.log(loggedin)
         if (!loggedin){
-          res.render('changepw', {
+          return res.render('changepw', {
             user: user
           });
         } else {
-          res.render('dashboard', {
+          return res.render('dashboard', {
             user: user
           });
         }
@@ -386,19 +386,19 @@ app.post('/postNews', async (req, res) => {
   }
 });
 
-app.post('/addUser', async (req, res) => {
+app.post('/addUser', userRole.is('superuser!'), async (req, res) => {
   const randomPassword = randomstring.generate({
     length: 12,
     readable: true,
     charset: 'alphanumeric'
   });
-  const hashedRandomPassword = await bcrypt.hash(randomPassword, 10)
+
 
   try {
-    console.log(req.session.passport.user.email)
+    const hashedRandomPassword = await bcrypt.hash(randomPassword, 10)
     const { userName, displayName, userEmail, role, yourPassword } = req.body;
-    console.log(randomPassword);
-    await pool.query('insert into users (username, name, email, role, hashedpw) values ($1, $2, $3, $4, $5)',[userName, displayName, userEmail, role, hashedRandomPassword])
+
+
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
@@ -418,7 +418,9 @@ app.post('/addUser', async (req, res) => {
       if (error) {
         console.log(error);
       } else {
+        pool.query('insert into users (username, name, email, role, hashedpw) values ($1, $2, $3, $4, $5)',[userName, displayName, userEmail, role, hashedRandomPassword])
         console.log('Email sent: ' + info.response);
+        console.log(`${displayName}'s temp password is ${randomPassword}`);
       }
     });
 
