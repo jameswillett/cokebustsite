@@ -415,11 +415,14 @@ app.post('/addUser', userRole.is('superuser!'), async (req, res) => {
 
     transporter.sendMail(mailOptions, function(error, info){
       if (error) {
-        return res.send(error);
+        console.log(error);
       } else {
         pool.query('insert into users (username, name, email, role, hashedpw) values ($1, $2, $3, $4, $5)',[userName, displayName, userEmail, role, hashedRandomPassword])
         console.log('Email sent: ' + info.response);
         console.log(`${displayName}'s temp password is ${randomPassword}`);
+        return res.render('dashboard',{
+          user: req.session.passport.user
+        });
       }
     });
 
@@ -427,9 +430,7 @@ app.post('/addUser', userRole.is('superuser!'), async (req, res) => {
     console.log(err)
   }
 
-  return res.render('dashboard',{
-    user: req.session.passport.user
-  });
+
 })
 
 app.get('/secretpage', userRole.is('superuser!'), (req, res) => {
