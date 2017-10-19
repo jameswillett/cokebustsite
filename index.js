@@ -61,7 +61,7 @@ app.use((req, res, next) => {
   req.session.clicks++;
   next();
 });
-
+/*
 app.use((req, res, next) => {
   var ip = req.headers['x-forwarded-for'] ||
      req.connection.remoteAddress ||
@@ -71,7 +71,7 @@ app.use((req, res, next) => {
     res.redirect('http://www.tacospin.com')
   }
   next();
-})
+})*/
 
 passport.use(new LocalStrategy( async (username, password, done) => {
   try {
