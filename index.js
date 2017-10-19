@@ -394,7 +394,6 @@ app.post('/addUser', userRole.is('superuser!'), async (req, res) => {
     charset: 'alphanumeric'
   });
 
-
   try {
     const hashedRandomPassword = await bcrypt.hash(randomPassword, 10)
     const { userName, displayName, userEmail, role, yourPassword } = req.body;
