@@ -13,29 +13,24 @@
         <input type='submit' id='submitButton'>
       </form>
       <%= err %>
+      <div id = 'error'></div>
     </div>
     <script>
       const pw1 = document.getElementById( 'password1' )
       const pw2 = document.getElementById( 'password2' )
-      const errEl = document.createElement( 'div' );
-      const clearFields = ( ) => {
-
-        document.getElementById( 'admin' ).appendChild(errEl);
+      const errEl = document.getElementById('error')
+      const badPw = (message, e) => {
+        e.preventDefault();
+        errEl.textContent = message;
         pw1.value = '';
         pw2.value = '';
       }
       document.getElementById( 'form' ).addEventListener( 'submit', e => {
-        errEl.textContent = '';
         if ( pw1.value != pw2.value ) {
-          e.preventDefault();
-          errEl.textContent = 'passwords dont match yo';
-          clearFields();
+          badPw('passwords dont match yo',e);
         } else if ( !/(?=.{8,})/.test(pw1.value) ) {
-          e.preventDefault();
-          errEl.textContent = '8 characters or longer dumbass'
-          clearFields();
+          badPw('8 characters or longer dumbass',e)
         }
-
       })
     </script>
   </body>
