@@ -9,7 +9,7 @@
       <% if (user.role == 'chetan')  { %>
         <h1> this is as far as you go chetan </h1>
       <% } %>
-      <% if (user.role == 'superuser!' || user.role == 'superuser!'){ %>
+      <% if (user.role == 'pleb' || user.role == 'superuser!'){ %>
         <h1>Add News</h1>
         <form id='form' method="post" action="/postNews">
           Author: <input type='text' name='author' value='<%= user.name %>' required><br />

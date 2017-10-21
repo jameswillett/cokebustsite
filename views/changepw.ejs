@@ -7,8 +7,12 @@
   <body>
     <div id='admin'>
       <h1>change password for <%= user.username %></h1>
+      <% if (err){ %>
+        <%= err %>
+      <% } %>
       <form id='form' method="post" action="/resetPW">
         New PW: <input type='password' name='password' required><br />
+        Confirm: <input type='password' name='password2' required><br />
         <input type='submit' id='submitButton'>
       </form>
     </div>

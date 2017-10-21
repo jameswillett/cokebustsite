@@ -331,7 +331,9 @@ app.get('/admin', (req,res) => {
 });
 
 app.post('/dashboard', (req, res, next) => {
+
   passport.authenticate('local', (err, user) => {
+
     if (err) {
       return next(err);
     }
@@ -346,10 +348,10 @@ app.post('/dashboard', (req, res, next) => {
       }
       try {
         const { rows: [{ loggedin }] } = await pool.query('select loggedin from users where username = $1',[req.session.passport.user.username])
-        console.log(loggedin)
         if (!loggedin){
           res.render('changepw', {
-            user: user
+            user: user,
+            err: ''
           });
         } else {
           res.render('dashboard', {
@@ -364,12 +366,21 @@ app.post('/dashboard', (req, res, next) => {
 });
 
 app.post('/resetPW', (req, res) => {
-  const user = req.session.passport.user.username;
-  bcrypt.hash(req.body.password, 10, async (err, hash) => {
-    try {
-    await pool.query('update users set hashedpw = $1, loggedin = $2 where username = $3', [hash, '1', user])
+  const { user } = req.session.passport;
+  const { password, password2 } = req.body
+  if (password != password2){
+    return res.render('changepw',{
+      user: user,
+      err: 'passwords dont match!'
+    })
+  }
 
-    res.redirect('/admin');
+  bcrypt.hash(password, 10, async (err, hash) => {
+    try {
+    await pool.query('update users set hashedpw = $1, loggedin = $2 where username = $3', [hash, '1', user.username])
+    return res.render('dashboard', {
+      user: user
+    });
     } catch (err){
       console.log(err)
     };
@@ -429,8 +440,6 @@ app.post('/addUser', userRole.is('superuser!'), async (req, res) => {
   } catch (err) {
     console.log(err)
   }
-
-
 })
 
 app.get('/secretpage', userRole.is('superuser!'), (req, res) => {
