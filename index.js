@@ -13,7 +13,6 @@ const nodemailer = require( 'nodemailer' );
 const smtpTransport = require( 'nodemailer-smtp-transport' );
 const { Pool } = require( 'pg' );
 
-
 const connectionString = process.env.DATABASE_URL || 'postgresql://James:@localhost:5432/James';
 const pool = new Pool ({
   connectionString: connectionString
@@ -236,7 +235,9 @@ app.post('/postComment', async (req, res) => {
     return res.redirect('http://www.tacospin.com');
   }
   try {
-    await pool.query('insert into guestbook (author, content, ip) values ($1, $2, $3)', [req.body.author, sanitizeHtml(req.body.content), ip])
+    await pool.query('insert into guestbook (author, content, ip) values ($1, $2, $3)', [req.body.author, sanitizeHtml(req.body.content,{
+                allowedTags: sanitizeHtml.defaults.allowedTags.concat([ 'img' ])
+    }), ip])
     console.log(`${req.body.author} posted from ${ip} : ${req.body.content}`)
     res.redirect('/guestbook');
   } catch (err){
@@ -389,7 +390,9 @@ app.post('/resetPW', (req, res) => {
 
 app.post('/postNews', async (req, res) => {
   try {
-    await pool.query('insert into news (author, content) values ($1, $2)',[req.body.author, sanitizeHtml(req.body.content)])
+    await pool.query('insert into news (author, content) values ($1, $2)',[req.body.author, sanitizeHtml(req.body.content,{
+                allowedTags: sanitizeHtml.defaults.allowedTags.concat([ 'img' ])
+    })])
     res.render('dashboard',{
       user: req.session.passport.user
     });
