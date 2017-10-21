@@ -7,16 +7,36 @@
   <body>
     <div id='admin'>
       <h1>change password for <%= user.username %></h1>
-      <% if (err){ %>
-        <%= err %>
-      <% } %>
       <form id='form' method="post" action="/resetPW">
-        New PW: <input type='password' name='password' required><br />
-        Confirm: <input type='password' name='password2' required><br />
+        New PW: <input id = 'password1' type='password' name='password' required><br />
+        Confirm: <input id = 'password2' type='password' name='password2' required><br />
         <input type='submit' id='submitButton'>
       </form>
+      <%= err %>
     </div>
     <script>
+      const pw1 = document.getElementById( 'password1' )
+      const pw2 = document.getElementById( 'password2' )
+      const errEl = document.createElement( 'div' );
+      const clearFields = ( ) => {
+
+        document.getElementById( 'admin' ).appendChild(errEl);
+        pw1.value = '';
+        pw2.value = '';
+      }
+      document.getElementById( 'form' ).addEventListener( 'submit', e => {
+        errEl.textContent = '';
+        if ( pw1.value != pw2.value ) {
+          e.preventDefault();
+          errEl.textContent = 'passwords dont match yo';
+          clearFields();
+        } else if ( !/(?=.{8,})/.test(pw1.value) ) {
+          e.preventDefault();
+          errEl.textContent = '8 characters or longer dumbass'
+          clearFields();
+        }
+
+      })
     </script>
   </body>
 </html>
