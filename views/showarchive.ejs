@@ -12,7 +12,7 @@
             <th>FB event Page</th>
           </tr>
           <% shows.map( show => { %>
-            <tr>
+            <tr id='showid-<%= show.id %>'>
               <td class='showInfo'>
                 <%= show.date.getMonth()+1 %>/<%= show.date.getDate() %>/<%= show.date.getYear() - 100 %>
               </td>
