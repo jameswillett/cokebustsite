@@ -13,12 +13,35 @@
           </tr>
           <% shows.map( show => { %>
             <tr id='showid-<%= show.id %>'>
+<<<<<<< HEAD
               <td class='showInfo'><%= show.date.getMonth()+1 %>/<%= show.date.getDate() %>/<%= show.date.getYear() - 100 %></td>
               <td class='showInfo'><%= show.venue %></td>
               <td class='showInfo'><%= show.address %></td>
               <td class='showInfo'><%= show.time %></td>
               <td class='showInfo'><%= show.notes %></td>
               <td class='showInfo'><% if ( show.links ) { %><a href="<%= show.links %>">XXX</a><% } %></td>
+=======
+              <td class='showInfo'>
+                <%= show.date.getMonth()+1 %>/<%= show.date.getDate() %>/<%= show.date.getYear() - 100 %>
+              </td>
+              <td class='showInfo'>
+                <%= show.venue %>
+              </td>
+              <td class='showInfo'>
+                <%= show.address %>
+              </td>
+              <td class='showInfo'>
+                <%= show.time %>
+              </td>
+              <td class='showInfo'>
+                <%= show.notes %>
+              </td>
+              <% if ( show.links ) { %>
+                <td class='showInfo'>
+                  <a href="<%= show.links %>">XXX</a>
+                </td>
+              <% } %>
+>>>>>>> 0a4a24bbb84847e13d27701847c1e359da1b5942
             </tr>
           <% }) %>
         </table>
