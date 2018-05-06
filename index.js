@@ -329,7 +329,7 @@ app.get('/releases/:id', async (req, res) => {
 
 app.get('/api/releases', async (req, res) => {
   try {
-    const { rows: releases } = await pool.quert('select * from releases');
+    const { rows: releases } = await pool.query('select * from releases');
     res.send(releases);
   } catch (err) {
     console.log(err);
