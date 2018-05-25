@@ -4,7 +4,7 @@
   "description": "node server for cb site",
   "main": "index.js",
   "engines": {
-    "node": ">= 7.6.0"
+    "node": ">= 8.10.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
